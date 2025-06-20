@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latestmajor</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\SharpCord.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\Buttons\" />
+      <Folder Include="Models\Guilds\" />
+    </ItemGroup>
+
+</Project>
