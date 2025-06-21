@@ -24,7 +24,8 @@ public enum ApplicationCommandType
     Message = 3,
 
     /// <summary>
-    /// 
+    /// Represents the primary command entry point, serving as the main interface
+    /// for initiating or handling an application command.
     /// </summary>
     PrimaryEntryPoint = 4,
 }
