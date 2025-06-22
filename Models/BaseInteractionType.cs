@@ -12,7 +12,8 @@ public enum BaseInteractionType
     Ping = 1,
 
     /// <summary>
-    /// 
+    /// Represents an interaction triggered by the execution of an application command,
+    /// such as slash commands or context menu actions within the application.
     /// </summary>
     ApplicationCommand = 2,
 

@@ -95,7 +95,7 @@ public enum ChannelType
 
     /// <summary>
     /// Represents a stage channel in a guild where users can participate in or listen to live audio discussions.
-    /// Stage channels are optimized for events such as conferences, Q&A sessions, and similar organized conversations.
+    /// Stage channels are optimized for events such as conferences, Questions and Answers sessions, and similar organized conversations.
     /// </summary>
     GuildStageVoice = 13,
 

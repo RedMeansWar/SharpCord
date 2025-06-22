@@ -81,7 +81,7 @@ public class CommandAttribute : Attribute
     public string? GuildId { get; set; }
 
     /// <summary>
-    /// Represents an attribute to define a command that can be executed within the application.
+    /// Represents an attribute to define an application (/) command.
     /// </summary>
     /// <remarks>
     /// This attribute is used to annotate methods and provides metadata such as the command's
