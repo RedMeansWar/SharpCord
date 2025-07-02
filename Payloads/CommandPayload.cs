@@ -4,7 +4,7 @@ using SharpCord.Models;
 namespace SharpCord.Payloads;
 
 /// <summary>
-/// 
+/// Represents the structure of a command payload that can be registered with Discord's API.
 /// </summary>
 public class CommandPayload
 {

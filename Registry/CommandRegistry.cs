@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using SharpCord.Attributes;
+using SharpCord.Models;
 using SharpCord.Utils;
 using SharpCord.Payloads;
 
@@ -127,9 +128,10 @@ public static class CommandRegistry
                 var name = slashAttr.Name.ToLower();
                 SlashCommands[name] = method;
                 CommandInstances[name] = instance;
+                Log.Info($"Registered slash command: {name}");
                 continue;
             }
-
+            
             var prefixAttr = method.GetCustomAttribute<PrefixCommandAttribute>();
             if (prefixAttr is not null)
             {

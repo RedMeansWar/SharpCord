@@ -38,7 +38,7 @@ public class EventHandlerAttribute : Attribute
     /// It supports event-driven systems by mapping incoming Discord event data to their respective method handlers.
     /// </remarks>
     public EventHandlerAttribute(DiscordEvents evt) => EventName = ToDiscordString(evt);
-
+    
     internal static string ToDiscordString(DiscordEvents evt)
     {
         return string.Concat(evt.ToString()

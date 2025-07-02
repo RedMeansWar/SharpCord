@@ -30,15 +30,41 @@ public class Interaction : BaseInteraction
                 Flags = ephemeral ? MessageFlags.Ephemeral : MessageFlags.None
             },
         };
-        
-        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+
+        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
         var contentBody = new StringContent(json, Encoding.UTF8, "application/json");
         var url = $"https://discord.com/api/v10/interactions/{Id}/{Token}/callback";
         
         using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new("Bot", DiscordClient.Token);
-        
         var response = await client.PostAsync(url, contentBody);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Discord API returned error: {response.StatusCode}\n{error}");
+        }
+    }
+
+    public async Task EditOriginalResponseAsync(string content, List<Embed>? embeds = null)
+    {
+        var payload = new ApplicationCommandCallbackData
+        {
+            Content = content,
+            Embeds = embeds
+        };
+    }
+
+    public async Task DeleteOriginalResponseAsync()
+    {
+        var url = $"https://discord.com/api/v10/webhooks/{ApplicationId}/{Token}/messages/@original";
+        using var client = new HttpClient();
+        var response = await client.DeleteAsync(url);
+        
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadAsStringAsync();
