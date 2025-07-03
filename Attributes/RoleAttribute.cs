@@ -50,5 +50,5 @@ public class AssignRoleAttribute : Attribute
         RoleId = roleId;
     }
     
-    public async Task ExecuteAsync() => await Roles.GiveRole(GuildId, UserId, RoleId);
+    public async Task ExecuteAsync() => await Roles.GiveRoleAsync(GuildId, UserId, RoleId);
 }
