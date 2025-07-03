@@ -23,14 +23,32 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using SharpCord.Models;
+using SharpCord.Users;
 
-namespace SharpCord.Interfaces;
+namespace SharpCord.Attributes;
 
 /// <summary>
-/// Represents a component with its associated type.
+/// Represents an attribute used to assign a specific role to a Discord user.
 /// </summary>
-public interface IComponent
+/// <remarks>
+/// This attribute is used to decorate methods, marking them as responsible for handling role assignment operations.
+/// It can only be applied to methods and cannot be applied multiple times to the same method.
+/// </remarks>
+[AttributeUsage(AttributeTargets.Method)]
+public class AssignRoleAttribute : Attribute
 {
-    ComponentType Type { get; set; }
+    public string GuildId { get; set; }
+    
+    public string UserId { get; set; }
+    
+    public string RoleId { get; set; }
+
+    public AssignRoleAttribute(string guildId, string userId, string roleId)
+    {
+        GuildId = guildId;
+        UserId = userId;
+        RoleId = roleId;
+    }
+    
+    public async Task ExecuteAsync() => await Roles.GiveRole(GuildId, UserId, RoleId);
 }

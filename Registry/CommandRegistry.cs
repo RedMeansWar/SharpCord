@@ -1,3 +1,28 @@
+#region LICENSE
+// Copyright (c) 2025 RedMeansWar
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+#endregion
+
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
@@ -47,6 +72,16 @@ public static class CommandRegistry
     /// </remarks>
     public static Dictionary<string, MethodInfo> PrefixCommands { get; private set; } = new();
 
+    /// <summary>
+    /// Serves as a mapping of command names to their respective options or metadata used in command registration.
+    /// </summary>
+    /// <remarks>
+    /// This dictionary stores details associated with each registered command, where the keys are command names and
+    /// the values represent the options or configurations related to each command. These options are often utilized
+    /// to define parameters, behaviors, or additional metadata for commands during their execution or registration process.
+    /// </remarks>
+    public static Dictionary<string, List<ApplicationCommandOption>> CommandOptions { get; private set; } = new();
+    
     /// <summary>
     /// Registers all slash commands defined in the application by sending payloads to the Discord API.
     /// </summary>
@@ -111,15 +146,15 @@ public static class CommandRegistry
     /// This method scans the specified type for public instance methods decorated with
     /// either <see cref="SharpCord.Attributes.CommandAttribute"/> or
     /// <see cref="SharpCord.Attributes.PrefixCommandAttribute"/> attributes. Slash commands are registered with their
-    /// corresponding attributes in <see cref="SharpCord.Commands.CommandRegistry.SlashCommands"/>, while prefix-based
-    /// commands are stored in <see cref="SharpCord.Commands.CommandRegistry.PrefixCommands"/>. Additionally, instances of the
+    /// corresponding attributes in <see cref="SharpCord.Registry.CommandRegistry.SlashCommands"/>, while prefix-based
+    /// commands are stored in <see cref="SharpCord.Registry.CommandRegistry.PrefixCommands"/>. Additionally, instances of the
     /// containing class are stored for later invocation.
     /// </remarks>
     public static void RegisterCommandsFrom<T>()
     {
         var type = typeof(T);
         var instance = Activator.CreateInstance(type)!;
-
+        
         foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
         {
             var slashAttr = method.GetCustomAttribute<CommandAttribute>();
@@ -128,10 +163,27 @@ public static class CommandRegistry
                 var name = slashAttr.Name.ToLower();
                 SlashCommands[name] = method;
                 CommandInstances[name] = instance;
-                Log.Info($"Registered slash command: {name}");
-                continue;
+                PrefixCommands[name] = method;
+
+                var options = new List<ApplicationCommandOption>();
+                foreach (var param in method.GetParameters())
+                {
+                    var optionAttr = param.GetCustomAttribute<OptionsAttribute>();
+                    if (optionAttr is null) continue;
+                    
+                    var option = new ApplicationCommandOption
+                    {
+                        Name = optionAttr.Name,
+                        Description = optionAttr.Description,
+                        Type = optionAttr.Type,
+                        Required = optionAttr.Required
+                    };
+                    options.Add(option);
+                }
+
+                CommandOptions[name] = options;
             }
-            
+
             var prefixAttr = method.GetCustomAttribute<PrefixCommandAttribute>();
             if (prefixAttr is not null)
             {
@@ -139,6 +191,6 @@ public static class CommandRegistry
                 PrefixCommands[name] = method;
                 CommandInstances[name] = instance;
             }
-        } 
+        }
     }
 }

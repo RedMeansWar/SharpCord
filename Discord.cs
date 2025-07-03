@@ -1,4 +1,29 @@
-﻿using System.Net;
+﻿#region LICENSE
+// Copyright (c) 2025 RedMeansWar
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+#endregion
+
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Text;
@@ -94,12 +119,13 @@ public class DiscordClient
         var bytes = Encoding.UTF8.GetBytes(json);
         
         await _socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
-        Log.Info("Successfully logging in.");
+        Log.Info("Successfully Logged in.");
 
         await ListenForEvents();
     }
 
-    private async Task ListenForEvents()
+    #region Private Methods
+    internal async Task ListenForEvents()
     {
         var buffer = new byte[1024];
         var messageBuffer = new StringBuilder();
@@ -107,32 +133,19 @@ public class DiscordClient
         while (_socket.State == WebSocketState.Open)
         {
             var result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-            // Check if we are receiving a text message
             if (result.MessageType != WebSocketMessageType.Text) continue;
             
-            // Append the received data to the message buffer
             messageBuffer.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-
-            // Check if we have received the full message
             if (!result.EndOfMessage) continue;
                 
             try
             {
-                // Now that we have the full message, parse it as JSON
                 var message = messageBuffer.ToString();
                 var json = JsonDocument.Parse(message);
-
-                // Process the event
+                
                 var opCode = json.RootElement.GetProperty("op").GetInt32();
                 var eventName = json.RootElement.GetProperty("t").GetString();
                 var payload = json.RootElement.GetProperty("d");
-
-                // Log the event name and payload (for debugging)
-                if (string.IsNullOrEmpty(eventName))
-                    Console.WriteLine("");
-                else
-                    Log.Info($"Received event: {eventName} @ {DateTime.UtcNow}");
 
                 if (eventName == "INTERACTION_CREATE")
                 {
@@ -181,4 +194,5 @@ public class DiscordClient
         int padding = 4 - base64.Length % 4;
         return base64 + new string('=', padding % 4);
     }
+    #endregion
 }

@@ -23,14 +23,27 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using SharpCord.Models;
+using System.Net.Http.Headers;
+using SharpCord.Utils;
 
-namespace SharpCord.Interfaces;
+namespace SharpCord.Users;
 
-/// <summary>
-/// Represents a component with its associated type.
-/// </summary>
-public interface IComponent
+public class Roles
 {
-    ComponentType Type { get; set; }
+    public static async Task GiveRoleAsync(string guildId, string userId, string roleId)
+    {
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", DiscordClient.Token);
+
+        var url = $"https://discord.com/api/v10/guilds/{guildId}/members/{userId}/roles/{roleId}";
+        var response = await client.PutAsync(url, null);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            Log.Error($"❌ Failed to assign role: {response.StatusCode}\n{body}");
+        }
+        
+        Log.Info($"✅ Assigned role {roleId} to user {userId} in guild {guildId}.");
+    }
 }
