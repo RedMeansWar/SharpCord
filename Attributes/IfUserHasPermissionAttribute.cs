@@ -76,6 +76,6 @@ public class IfUserHasPermissionAttribute : Attribute
     /// <returns>A task representing the asynchronous operation. The result contains a boolean indicating whether the user has the specified permission.</returns>
     public async Task<bool> HasPermissionAsync()
     {
-        return await User.HasPermissions(GuildId, UserId, Permission);
+        return await User.HasPermissionsAsync(GuildId, UserId, Permission);
     }
 }

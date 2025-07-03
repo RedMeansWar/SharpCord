@@ -35,7 +35,7 @@ namespace SharpCord.Types;
 /// A Snowflake encapsulates a 64-bit unsigned integer and encodes information such as timestamp and worker ID.
 /// Implements interfaces for querying and comparison logic.
 /// </remarks>
-[JsonConverter((typeof(SnowflakeConverter)))]
+[JsonConverter(typeof(SnowflakeConverter))]
 public readonly struct Snowflake : IEquatable<Snowflake>, IComparable<Snowflake>
 {
     /// <summary>
@@ -143,6 +143,41 @@ public readonly struct Snowflake : IEquatable<Snowflake>, IComparable<Snowflake>
     /// The hash code is derived from the Snowflake's underlying 64-bit unsigned integer value.
     /// </returns>
     public override int GetHashCode() => Value.GetHashCode();
+
+    /// <summary>
+    /// Determines whether the specified object is equal to the current Snowflake instance.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current Snowflake instance.</param>
+    /// <returns>True if the specified object is a Snowflake and is equal to the current instance; otherwise, false.</returns>
+    public override bool Equals(object? obj) => obj is Snowflake snowflake && Equals(snowflake);
+
+    /// <summary>
+    /// Determines whether the current Snowflake value is valid.
+    /// </summary>
+    /// <returns>
+    /// True if the Snowflake value is valid (non-zero); otherwise, false.
+    /// </returns>
+    public bool IsValid() => Value != 0;
+
+    /// <summary>
+    /// Attempts to parse the specified string representation of a Snowflake identifier.
+    /// </summary>
+    /// <param name="value">The string representation of the Snowflake to parse.</param>
+    /// <param name="result">When this method returns, contains the parsed Snowflake if the operation was successful; otherwise, it is set to the default Snowflake value.</param>
+    /// <returns>
+    /// A boolean value indicating whether the parsing operation succeeded.
+    /// </returns>
+    public static bool TryParse(string value, out Snowflake result)
+    {
+        result = default;
+        if (ulong.TryParse(value, out var resultValue))
+        {
+            result = new Snowflake(resultValue);
+            return true;
+        }
+
+        return false;
+    }
 }
 
 /// <summary>

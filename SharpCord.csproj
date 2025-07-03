@@ -11,8 +11,4 @@
       <DocumentationFile>bin\Debug\SharpCord.xml</DocumentationFile>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\Guilds\" />
-    </ItemGroup>
-
 </Project>

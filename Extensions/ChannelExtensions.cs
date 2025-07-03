@@ -23,31 +23,11 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using SharpCord.Types;
-
-namespace SharpCord.Models;
+namespace SharpCord.Extensions;
 
 /// <summary>
 /// 
 /// </summary>
-public class BaseGuildEmojiManager : Base
+public static class ChannelExtensions
 {
-    /// <summary>
-    /// The unique identifier of the guild associated with the emoji manager.
-    /// </summary>
-    /// <remarks>
-    /// The <c>GuildId</c> property is represented as a Snowflake structure, providing a globally unique identifier
-    /// for the guild. This ID is used to establish context and scope for objects and actions within the guild.
-    /// </remarks>
-    public Snowflake GuildId { get; set; }
-
-    /// <summary>
-    /// A collection of guild-specific emojis.
-    /// </summary>
-    /// <remarks>
-    /// This property represents a list of emojis associated with a specific guild. Each emoji in the list
-    /// adheres to the structure and details defined by the <c>BaseGuildEmoji</c> class, including attributes
-    /// such as ID, name, animation status, and availability. The collection is initialized as an empty list by default.
-    /// </remarks>
-    public List<BaseGuildEmoji> Emojis { get; set; } = new();
 }

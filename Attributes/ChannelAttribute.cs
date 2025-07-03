@@ -112,5 +112,5 @@ public class DeleteChannelAttribute : Attribute
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    public async Task ExecuteAsync() => await Channel.DeleteChannelAsync(GuildId, ChannelId);
+    public async Task ExecuteAsync() => await Channel.DeleteChannelAsync(ChannelId);
 }

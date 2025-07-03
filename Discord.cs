@@ -23,6 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System.Drawing;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.WebSockets;
@@ -124,6 +125,34 @@ public class DiscordClient
         Log.Info("Successfully Logged in.");
 
         await ListenForEvents();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="description"></param>
+    /// <param name="color"></param>
+    /// <param name="fields"></param>
+    /// <returns></returns>
+    public Embed BuildEmbed(string title, string description, uint color, List<EmbedField>? fields = null)
+    {
+        var embed = new Embed
+        {
+            Title = title,
+            Description = description,
+            Color = color
+        };
+        
+        if (fields != null)
+        {
+            foreach (var field in fields)
+            {
+                embed.Fields?.Add(field);
+            }
+        }
+
+        return embed;
     }
 
     #region Private Methods

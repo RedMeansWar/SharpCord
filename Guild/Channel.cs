@@ -100,8 +100,28 @@ public class Channel
         Log.Info($"✅ Created channel '{name}' in guild {guildId}");
     }
 
-    public static async Task DeleteChannelAsync(string guildId, string channelId)
+    /// <summary>
+    /// Asynchronously deletes a channel with the specified channel ID.
+    /// </summary>
+    /// <param name="channelId">The unique identifier of the channel to be deleted.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="Exception">Thrown if the deletion operation fails, including details about the failure.</exception>
+    public static async Task DeleteChannelAsync(string channelId)
     {
+        var payload = new
+        {
+            channel_id = channelId
+        };
+
+        var url = $"/channels/{channelId}";
         
+        var response = await HttpHelper.SendRequestAsync(url, "DELETE", payload);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new Exception($"❌ Failed to delete channel: {response.StatusCode}\n{body}");
+        }
+        
+        Log.Info($"✅ Deleted channel '{channelId}' in.");
     }
 }

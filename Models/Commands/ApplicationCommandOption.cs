@@ -83,7 +83,7 @@ public class ApplicationCommandOption
     [JsonPropertyName("channel_types")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<ChannelType>? ChannelTypes { get; set; }
-
+    
     /// <summary>
     /// Gets or sets the minimum value for a numeric option in an application command.
     /// Defines the smallest acceptable value a user can provide for this input.

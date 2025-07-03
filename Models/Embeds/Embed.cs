@@ -54,7 +54,7 @@ public class Embed
     /// Represents the color of the embed as an integer value, which is usually used to define the embed's visual accent or theme.
     /// This property is optional and can be omitted if a specific embed color is not required.
     [JsonPropertyName("color")]
-    public int? Color { get; set; }
+    public uint? Color { get; set; }
 
     /// Gets or sets the timestamp of the embed.
     /// Represents a point in time associated with the embed message, typically used to indicate when the message or event occurred.
