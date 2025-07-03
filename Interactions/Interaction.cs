@@ -56,17 +56,14 @@ public class Interaction : BaseInteraction
             },
         };
 
-        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        JsonSerializerOptions options = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        };
 
-        var contentBody = new StringContent(json, Encoding.UTF8, "application/json");
-        var url = $"https://discord.com/api/v10/interactions/{Id}/{Token}/callback";
-        
-        using var client = new HttpClient();
-        var response = await client.PostAsync(url, contentBody);
+        var url = $"/interactions/{Id}/{Token}/callback";
+        var response = await HttpHelper.SendRequestAsync(url, "POST", payload, options);
         
         if (!response.IsSuccessStatusCode)
         {
@@ -92,17 +89,15 @@ public class Interaction : BaseInteraction
             Flags = ephemeral ? MessageFlags.Ephemeral : MessageFlags.None
         };
         
-        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        JsonSerializerOptions options = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        
-        var contentBody = new StringContent(json, Encoding.UTF8, "application/json");
+        };
+
         var url = $"https://discord.com/api/v10/interactions/{Id}/{Token}/callback";
         
-        using var client = new HttpClient();
-        var response = await client.PostAsync(url, contentBody);
+        var response = await HttpHelper.SendRequestAsync(url, "POST", payload, options);
         
         if (!response.IsSuccessStatusCode)
         {
@@ -126,15 +121,14 @@ public class Interaction : BaseInteraction
             Embeds = embeds
         };
 
-        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+        JsonSerializerOptions options = new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        
-        var url = $"https://discord.com/api/v10/webhooks/{ApplicationId}/{Token}/messages/@original";
-        using var client = new HttpClient();
-        var response = await client.PatchAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+        };
+
+        var url = $"/webhooks/{ApplicationId}/{Token}/messages/@original";
+        var response = await HttpHelper.SendRequestAsync(url, "PATCH", payload, options);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -150,9 +144,8 @@ public class Interaction : BaseInteraction
     /// <exception cref="Exception">Thrown when the Discord API returns an error response.</exception>
     public async Task DeleteOriginalResponseAsync()
     {
-        var url = $"https://discord.com/api/v10/webhooks/{ApplicationId}/{Token}/messages/@original";
-        using var client = new HttpClient();
-        var response = await client.DeleteAsync(url);
+        var url = $"/webhooks/{ApplicationId}/{Token}/messages/@original";
+        var response = await HttpHelper.SendRequestAsync(url, "DELETE");
         
         if (!response.IsSuccessStatusCode)
         {
@@ -192,9 +185,8 @@ public class Interaction : BaseInteraction
         multipart.Add(new StringContent(json, Encoding.UTF8, "application/json"), "payload_json");
         multipart.Add(new StreamContent(fileStream), "files[0]", fileName);
 
-        var url = $"https://discord.com/api/v10/interactions/{Id}/{Token}/callback";
-        using var client = new HttpClient();
-        var response = await client.PostAsync(url, multipart);
+        var url = $"/interactions/{Id}/{Token}/callback";
+        var response = await HttpHelper.SendRequestAsync(url, "POST", multipart);
         
         if (!response.IsSuccessStatusCode)
         {

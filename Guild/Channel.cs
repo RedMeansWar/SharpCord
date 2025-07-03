@@ -56,16 +56,11 @@ public class Channel
             parentId,
             position
         };
-        
-        var json = JsonSerializer.Serialize(payload);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", interaction.Token);
 
         var guildId = interaction.GuildId;
-        var url = $"https://discord.com/api/v10/guilds/{guildId}/channels";
-        var response = await client.PostAsync(url, content);
+        var url = $"/guilds/{guildId}/channels";
+
+        var response = await HttpHelper.SendRequestAsync(url, "POST", payload);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -93,15 +88,9 @@ public class Channel
             type = (int)type
         };
 
-        var json = JsonSerializer.Serialize(payload);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var url = $"/guilds/{guildId}/channels";
 
-        var url = $"https://discord.com/api/v10/guilds/{guildId}/channels";
-
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", DiscordClient.Token);
-
-        var response = await client.PostAsync(url, content);
+        var response = await HttpHelper.SendRequestAsync(url, "POST", payload);
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();

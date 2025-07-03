@@ -97,9 +97,6 @@ public static class CommandRegistry
     /// </returns>
     public static async Task RegisterAllSlashCommandsAsync()
     {
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", DiscordClient.Token);
-
         foreach (var command in SlashCommands)
         {
             var method = command.Value;
@@ -116,15 +113,13 @@ public static class CommandRegistry
                 NSFW = attr.NSFW
             };
 
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
             var applicationId = DiscordClient.GetApplicationIdFromToken();
 
             var url = attr.GuildId is not null
-                ? $"https://discord.com/api/v10/applications/{applicationId}/guilds/{attr.GuildId}/commands"
-                : $"https://discord.com/api/v10/applications/{applicationId}/commands";
+                ? $"/applications/{applicationId}/guilds/{attr.GuildId}/commands"
+                : $"/applications/{applicationId}/commands";
 
-            var response = await client.PostAsync(url, content);
+            var response = await HttpHelper.SendRequestAsync(url, "POST", payload);
             if (response.IsSuccessStatusCode)
             {
                 Log.Info($"✅ Registered command: {payload.Name}");

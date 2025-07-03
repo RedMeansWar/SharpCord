@@ -96,6 +96,8 @@ public class DiscordClient
     {
         var gatewayUrl = "wss://gateway.discord.gg/?v=10&encoding=json";
 
+        HttpHelper.InitializeHelper(new());
+
         Id = await GetCurrentIdAsync(Token);
         await _socket.ConnectAsync(new Uri(gatewayUrl), CancellationToken.None);
 
@@ -117,7 +119,7 @@ public class DiscordClient
 
         var json = JsonSerializer.Serialize(identifyPayload);
         var bytes = Encoding.UTF8.GetBytes(json);
-        
+
         await _socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
         Log.Info("Successfully Logged in.");
 
@@ -163,10 +165,7 @@ public class DiscordClient
 
     internal static async Task<string> GetCurrentIdAsync(string token)
     {
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", token);
-
-        var response = await client.GetAsync("https://discord.com/api/v10/users/@me");
+        var response = await HttpHelper.SendRequestAsync("/users/@me", "GET");
 
         if (!response.IsSuccessStatusCode)
         {

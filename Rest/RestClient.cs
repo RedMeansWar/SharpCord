@@ -38,7 +38,7 @@ public class RestClient
 {
     internal readonly string _token;
     internal readonly HttpClient _http;
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -55,10 +55,10 @@ public class RestClient
     /// <param name="command"></param>
     public async Task RegisterGlobalCommandAsync(ApplicationCommand command)
     {
-        var json = JsonSerializer.Serialize(command, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower, Converters = { new JsonStringEnumConverter() } });
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        
-        var response = await _http.PostAsync($"https://discord.com/api/v10/applications/{command.ApplicationId}/commands", content);
+        JsonSerializerOptions options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower, Converters = { new JsonStringEnumConverter() } };
+
+        var response = await HttpHelper.SendRequestAsync($"/applications/{command.ApplicationId}/commands", "POST", command, options);
+
         response.EnsureSuccessStatusCode();
     }
 
@@ -70,15 +70,14 @@ public class RestClient
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task RegisterGuildCommandAsync(ApplicationCommand command, string guildId)
     {
-        var json = JsonSerializer.Serialize(command, new JsonSerializerOptions 
-        { 
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower, 
-            Converters = { new JsonStringEnumConverter() } 
-        });
-        
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        JsonSerializerOptions options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            Converters = { new JsonStringEnumConverter() }
+        };
 
-        var response = await _http.PostAsync($"https://discord.com/api/v10/applications/{command.ApplicationId}/guilds/{guildId}/commands", content);
+        var response = await HttpHelper.SendRequestAsync($"/applications/{command.ApplicationId}/guilds/{guildId}/commands", "POST", command, options);
+
         response.EnsureSuccessStatusCode();
     }
 
@@ -100,14 +99,14 @@ public class RestClient
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task EditGlobalCommandAsync(string applicationId, string commandId, ApplicationCommand command)
     {
-        var json = JsonSerializer.Serialize(command, new JsonSerializerOptions
+        JsonSerializerOptions options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
             Converters = { new JsonStringEnumConverter() }
-        });
+        };
 
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await _http.PatchAsync($"https://discord.com/api/v10/applications/{applicationId}/commands/{commandId}", content);
+        var response = await HttpHelper.SendRequestAsync($"/applications/{applicationId}/commands/{commandId}", "PATCH", command, options);
+
         response.EnsureSuccessStatusCode();
     }
 
@@ -121,14 +120,14 @@ public class RestClient
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task EditGuildCommandAsync(string applicationId, string commandId, string guildId, ApplicationCommand command)
     {
-        var json = JsonSerializer.Serialize(command, new JsonSerializerOptions
+        JsonSerializerOptions options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
             Converters = { new JsonStringEnumConverter() }
-        });
-        
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await _http.PatchAsync($"https://discord.com/api/v10/applications/{applicationId}/guilds/{guildId}/commands/{commandId}", content);
+        };
+
+        var response = await HttpHelper.SendRequestAsync($"/applications/{applicationId}/guilds/{guildId}/commands/{commandId}", "PATCH", command, options);
+
         response.EnsureSuccessStatusCode();
     }
 }

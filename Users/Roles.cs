@@ -32,11 +32,8 @@ public class Roles
 {
     public static async Task GiveRoleAsync(string guildId, string userId, string roleId)
     {
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", DiscordClient.Token);
-
-        var url = $"https://discord.com/api/v10/guilds/{guildId}/members/{userId}/roles/{roleId}";
-        var response = await client.PutAsync(url, null);
+        var url = $"/guilds/{guildId}/members/{userId}/roles/{roleId}";
+        var response = await HttpHelper.SendRequestAsync(url, "PUT", null);
 
         if (!response.IsSuccessStatusCode)
         {
