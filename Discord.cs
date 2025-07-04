@@ -182,8 +182,9 @@ public class DiscordClient
                 var eventName = json.RootElement.GetProperty("t").GetString();
                 var payload = json.RootElement.GetProperty("d");
 
-                if (eventName == "INTERACTION_CREATE")
-                    await EventRegistry.DispatchAsync(eventName, payload);
+                // either way works, not sure which one is rathered tho. 
+                //if (eventName == "INTERACTION_CREATE")
+                //    await EventRegistry.DispatchAsync(eventName, payload);
 
                 if (!string.IsNullOrWhiteSpace(eventName) || eventName is not null)
                     await EventRegistry.DispatchAsync(eventName, payload);
