@@ -63,7 +63,13 @@ public readonly struct Snowflake : IEquatable<Snowflake>, IComparable<Snowflake>
     /// A Snowflake is a 64-bit integer that encodes metadata such as timestamp and worker ID.
     /// This implementation allows operations such as comparison and string conversion.
     /// </remarks>
-    public Snowflake(string value) => Value = ulong.Parse(value);
+    public Snowflake(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Snowflake string cannot be null or empty.", nameof(value));
+
+        Value = ulong.Parse(value);
+    }
 
     /// <summary>
     /// Defines an implicit conversion operator from a Snowflake to a 64-bit unsigned integer.
@@ -178,6 +184,11 @@ public readonly struct Snowflake : IEquatable<Snowflake>, IComparable<Snowflake>
 
         return false;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool IsEmpty => Value == 0;
 }
 
 /// <summary>
@@ -199,11 +210,23 @@ public class SnowflakeConverter : JsonConverter<Snowflake>
     /// <exception cref="JsonException">Thrown when the JSON value cannot be converted to a valid <see cref="Snowflake"/>.</exception>
     public override Snowflake Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.String && ulong.TryParse(reader.GetString(), out var value) ||
-            reader.TokenType == JsonTokenType.Number && reader.TryGetUInt64(out value))
-            return new Snowflake(value);
+        if (reader.TokenType == JsonTokenType.Null)
+            return new Snowflake(0);
 
-        throw new JsonException("Invalid snowflake format");
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var str = reader.GetString();
+            if (string.IsNullOrWhiteSpace(str))
+                return new Snowflake(0);
+
+            if (ulong.TryParse(str, out var strValue))
+                return new Snowflake(strValue);
+        }
+
+        if (reader.TokenType == JsonTokenType.Number && reader.TryGetUInt64(out var numValue))
+            return new Snowflake(numValue);
+
+        throw new JsonException($"Cannot convert {reader.TokenType} to {nameof(Snowflake)}");
     }
 
     /// <summary>

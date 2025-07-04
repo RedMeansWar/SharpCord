@@ -44,7 +44,7 @@ public class Base
     /// metadata such as the creation timestamp. The identifier can be used for comparison, serialization, and
     /// referencing this object.
     /// </remarks>
-    public Snowflake Id { get; set; } = null!;
+    public Snowflake Id { get; set; }
 
     /// <summary>
     /// Gets or sets the raw JSON representation of this object.

@@ -179,9 +179,7 @@ public class DiscordClient
                 var payload = json.RootElement.GetProperty("d");
 
                 if (eventName == "INTERACTION_CREATE")
-                {
                     await EventRegistry.DispatchAsync(eventName, payload);
-                }
 
                 messageBuffer.Clear();
             }

@@ -306,14 +306,7 @@ public class Interaction : BaseInteraction
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="embeds"></param>
-    /// <param name="components"></param>
-    /// <param name="ephemeral"></param>
-    public async Task SendEmbedWithComponentsAsync(string content, List<Embed>? embeds = null, List<ActionRow>? components = null, bool ephemeral = false)
+    /*public async Task SendEmbedWithComponentsAsync(string content, List<Embed>? embeds = null, List<ActionRow>? components = null, bool ephemeral = false)
     {
         var payload = new InteractionResponse
         {
@@ -322,7 +315,7 @@ public class Interaction : BaseInteraction
             {
                 Content = content,
                 Embeds = embeds,
-                //Components = components?.Select(c => c.Build()).ToList(),
+                Components = components?.Select(c => c.E()).ToList(),
                 Flags = ephemeral ? MessageFlags.Ephemeral : MessageFlags.None
             },
         };
@@ -341,7 +334,7 @@ public class Interaction : BaseInteraction
             var error = await response.Content.ReadAsStringAsync();
             throw new Exception($"Discord API returned error: {response.StatusCode}\n{error}");
         }
-    }
+    }*/
 
     /// <summary>
     /// Retrieves the user associated with the current interaction.

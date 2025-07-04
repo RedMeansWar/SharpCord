@@ -53,7 +53,7 @@ public class BaseGuildMember : Base
     /// Each identifier represents a role that the member has within the guild. Roles are used to assign
     /// permissions, organize members, and apply hierarchy within a guild.
     /// </remarks>
-    public List<Snowflake> Roles { get; set; } = new();
+    public List<Snowflake> Roles { get; set; }
 
     /// <summary>
     /// Gets or sets the timestamp indicating when the member joined the guild.
