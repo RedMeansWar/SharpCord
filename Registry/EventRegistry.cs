@@ -39,8 +39,9 @@ namespace SharpCord.Registry;
 /// </summary>
 public static class EventRegistry
 {
-    internal static readonly Dictionary<string, List<MethodInfo>> _handlers = new();
-
+    internal static readonly Dictionary<string, List<MethodInfo>> Handlers = new();
+    private static readonly Dictionary<string, object> EventInstances = new();
+    
     /// <summary>
     /// Registers all methods within the specified type as event handlers
     /// if they are decorated with the <see cref="EventHandlerAttribute"/>.
@@ -54,16 +55,19 @@ public static class EventRegistry
     public static void RegisterEventsFrom<T>()
     {
         var type = typeof(T);
+        var instance = Activator.CreateInstance(type)!;
 
         foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
         {
             var attr = method.GetCustomAttribute<EventHandlerAttribute>();
-            if (attr is null) continue;
-            
-            if (!_handlers.TryGetValue(attr.EventName, out var list))
-                _handlers[attr.EventName] = list = [];
-            
-            list.Add(method);
+            if (attr == null) continue;
+
+            var eventName = attr.EventName;
+            if (!Handlers.ContainsKey(eventName))
+                Handlers[eventName] = new List<MethodInfo>();
+
+            Handlers[eventName].Add(method);
+            EventInstances[eventName] = instance;
         }
     }
 
@@ -114,30 +118,45 @@ public static class EventRegistry
             }
         }
         
-        if (!_handlers.TryGetValue(EventHandlerAttribute.ToDiscordString(evt), out var methods)) return;
+        if (!Handlers.TryGetValue(eventName, out var methods))
+            return;
 
         foreach (var method in methods)
         {
-            var instance = Activator.CreateInstance(method.DeclaringType!);
-            
+            var instance = EventInstances[eventName];
             var parameters = method.GetParameters();
-            switch (parameters.Length)
+
+            if (parameters.Length == 0)
             {
-                case 0: method.Invoke(instance, null); break;
-                case 1:
+                var result = method.Invoke(instance, null);
+                if (result is Task task)
+                    await task;
+            }
+            else
+            {
+                // If method expects payload, e.g., JsonElement or specific object
+                object? arg = payload;
+
+                if (parameters[0].ParameterType == typeof(JsonElement))
                 {
-                    var paramType = parameters[0].ParameterType;
-                    if (paramType == typeof(JsonElement))
+                    arg = payload;
+                }
+                else
+                {
+                    try
                     {
-                        method.Invoke(instance, [payload]);
+                        arg = JsonSerializer.Deserialize(payload.GetRawText(), parameters[0].ParameterType);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        var model = JsonSerializer.Deserialize(payload.GetRawText(), paramType);
-                        method.Invoke(instance, [model]);
+                        Console.WriteLine($"Failed to deserialize event payload for {eventName}: {ex.Message}");
+                        continue;
                     }
-                } 
-                break;
+                }
+
+                var result = method.Invoke(instance, [arg]);
+                if (result is Task task)
+                    await task;
             }
         }
     }

@@ -23,6 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System.ComponentModel.Design;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
@@ -105,30 +106,30 @@ public static class CommandRegistry
 
             var payload = new CommandPayload
             {
-                Name = attr.Name.ToLower(),
+                Name = attr.Name,
                 Description = string.IsNullOrWhiteSpace(attr.Description) ? "No description provided" : attr.Description,
                 Type = attr.Type,
                 DefaultMemberPermissions = attr.DefaultMemberPermissions,
                 DMPermission = attr.DMPermission,
-                NSFW = attr.NSFW
+                NSFW = attr.NSFW,
             };
 
-            var applicationId = DiscordClient.GetApplicationIdFromToken();
+            if (CommandOptions.TryGetValue(command.Key, out var options))
+                payload.Options = options;
 
+            var appId = DiscordClient.GetApplicationIdFromToken();
             var url = attr.GuildId is not null
-                ? $"/applications/{applicationId}/guilds/{attr.GuildId}/commands"
-                : $"/applications/{applicationId}/commands";
+                ? $"/applications/{appId}/guilds/{attr.GuildId}/commands"
+                : $"/applications/{appId}/commands";
 
             var response = await HttpHelper.SendRequestAsync(url, "POST", payload);
-            if (response.IsSuccessStatusCode)
-            {
-                Log.Info($"✅ Registered command: {payload.Name}");
-            }
-            else
+            if (!response.IsSuccessStatusCode)
             {
                 var body = await response.Content.ReadAsStringAsync();
                 Log.Error($"❌ Failed to register '{payload.Name}': {response.StatusCode}\n{body}");
             }
+            
+            Log.Info($"✅ Slash command '{payload.Name}' registered.");
         }
     }
 
@@ -145,47 +146,81 @@ public static class CommandRegistry
     /// commands are stored in <see cref="SharpCord.Registry.CommandRegistry.PrefixCommands"/>. Additionally, instances of the
     /// containing class are stored for later invocation.
     /// </remarks>
+    [Obsolete("Use CommandRegistry.RegisterModules(typeof(...)) instead.")]
     public static void RegisterCommandsFrom<T>()
     {
         var type = typeof(T);
         var instance = Activator.CreateInstance(type)!;
-        
+
         foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
         {
             var slashAttr = method.GetCustomAttribute<CommandAttribute>();
             if (slashAttr is not null)
             {
                 var name = slashAttr.Name.ToLower();
-                SlashCommands[name] = method;
-                CommandInstances[name] = instance;
-                PrefixCommands[name] = method;
 
-                var options = new List<ApplicationCommandOption>();
-                foreach (var param in method.GetParameters())
+                if (SlashCommands.TryAdd(name, method))
                 {
-                    var optionAttr = param.GetCustomAttribute<OptionsAttribute>();
-                    if (optionAttr is null) continue;
-                    
-                    var option = new ApplicationCommandOption
-                    {
-                        Name = optionAttr.Name,
-                        Description = optionAttr.Description,
-                        Type = optionAttr.Type,
-                        Required = optionAttr.Required
-                    };
-                    options.Add(option);
+                    CommandInstances[name] = instance;
+                    var options = method.GetParameters()
+                        .Select(param => param.GetCustomAttribute<OptionsAttribute>())
+                        .OfType<OptionsAttribute>()
+                        .Select(optionAttr => 
+                            new ApplicationCommandOption
+                            {
+                                Name = optionAttr.Name, 
+                                Description = optionAttr.Description, 
+                                Type = optionAttr.Type, 
+                                Required = optionAttr.Required
+                            })
+                        .ToList();
+
+                    CommandOptions[name] = options;
+                    Log.Info($"✅ Registered slash command: {name}");
                 }
-
-                CommandOptions[name] = options;
+                else
+                {
+                    Log.Warning($"⚠️ Slash command '{name}' already registered. Skipping.");
+                }
             }
-
+            
             var prefixAttr = method.GetCustomAttribute<PrefixCommandAttribute>();
             if (prefixAttr is not null)
             {
                 var name = prefixAttr.Name.ToLower();
-                PrefixCommands[name] = method;
-                CommandInstances[name] = instance;
+                if (PrefixCommands.TryAdd(name, method))
+                {
+                    CommandInstances[name] = instance;
+                    Log.Info($"✅ Registered prefix command: {name}");
+                }
+                else
+                {
+                    Log.Warning($"⚠️ Prefix command '{name}' already registered. Skipping.");
+                }
             }
+        }
+    }
+
+    /// <summary>
+    /// Registers command modules with the application.
+    /// </summary>
+    /// <param name="modules">An array of <see cref="Type"/> objects representing the modules to register. 
+    /// Each module type is expected to have a static method that can be used to register its commands, 
+    /// typically named 'RegisterCommandsFrom'.</param>
+    /// <example>
+    /// <code>
+    /// RegisterModules(typeof(UserCommands), typeof(AdminCommands));
+    /// </code>
+    /// </example>
+    public static void RegisterModules(params Type[] modules)
+    {
+        foreach (var type in modules)
+        {
+            var method = typeof(CommandRegistry)
+                .GetMethod(nameof(RegisterCommandsFrom))!
+                .MakeGenericMethod(type);
+            
+            method.Invoke(null, null);
         }
     }
 }

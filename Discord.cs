@@ -31,6 +31,7 @@ using System.Text;
 using System.Text.Json;
 using SharpCord.Models;
 using SharpCord.Registry;
+using SharpCord.Types;
 using SharpCord.Utils;
 
 namespace SharpCord;
@@ -71,10 +72,10 @@ public class DiscordClient
     /// for executing API operations that rely on application identity.
     /// </remarks>
     /// <value>
-    /// A string containing the unique identifier of the Discord bot application. This value is
+    /// A snowflake containing the unique identifier of the Discord bot application. This value is
     /// assigned once the authentication process successfully establishes a connection to the Discord API.
     /// </value>
-    public static string Id { get; private set; } = string.Empty;
+    public static Snowflake Id { get; private set; }
 
     /// <summary>
     /// Represents a client for connecting to the Discord Gateway API, allowing interaction
@@ -122,8 +123,11 @@ public class DiscordClient
         var bytes = Encoding.UTF8.GetBytes(json);
 
         await _socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+        
         Log.Info("Successfully Logged in.");
+        Log.Info($"Found {CommandRegistry.SlashCommands.Count} application (/) commands.");
 
+        await CommandRegistry.RegisterAllSlashCommandsAsync();
         await ListenForEvents();
     }
 
@@ -179,6 +183,9 @@ public class DiscordClient
                 var payload = json.RootElement.GetProperty("d");
 
                 if (eventName == "INTERACTION_CREATE")
+                    await EventRegistry.DispatchAsync(eventName, payload);
+
+                if (!string.IsNullOrWhiteSpace(eventName) || eventName is not null)
                     await EventRegistry.DispatchAsync(eventName, payload);
 
                 messageBuffer.Clear();
