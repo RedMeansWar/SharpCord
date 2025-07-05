@@ -32,6 +32,7 @@ using SharpCord.Attributes;
 using SharpCord.Models;
 using SharpCord.Utils;
 using SharpCord.Payloads;
+using SharpCord.Helpers;
 
 namespace SharpCord.Registry;
 

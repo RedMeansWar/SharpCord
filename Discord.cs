@@ -29,6 +29,7 @@ using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using SharpCord.Helpers;
 using SharpCord.Models;
 using SharpCord.Registry;
 using SharpCord.Types;
@@ -43,7 +44,6 @@ namespace SharpCord;
 public class DiscordClient
 {
     internal readonly GatewayIntent _intents;
-    internal ClientWebSocket _socket;
 
     /// <summary>
     /// Represents the authentication token used to connect and authenticate with the Discord API.
@@ -85,7 +85,6 @@ public class DiscordClient
     {
         Token = token;
         _intents = intents;
-        _socket = new();
     }
 
     /// <summary>
@@ -96,12 +95,12 @@ public class DiscordClient
     /// <returns>Returns a task representing the asynchronous login operation.</returns>
     public async Task LoginAsync()
     {
-        var gatewayUrl = "wss://gateway.discord.gg/?v=10&encoding=json";
-
         HttpHelper.InitializeHelper(new());
+        SocketHelper.InitalizeHelper();
 
         Id = await GetCurrentIdAsync(Token);
-        await _socket.ConnectAsync(new Uri(gatewayUrl), CancellationToken.None);
+
+        await SocketHelper.ConnectAsync();
 
         var identifyPayload = new
         {
@@ -120,15 +119,14 @@ public class DiscordClient
         };
 
         var json = JsonSerializer.Serialize(identifyPayload);
-        var bytes = Encoding.UTF8.GetBytes(json);
 
-        await _socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+        await SocketHelper.SendMessageAsync(json);
         
         Log.Info("Successfully Logged in.");
         Log.Info($"Found {CommandRegistry.SlashCommands.Count} application (/) commands.");
 
         await CommandRegistry.RegisterAllSlashCommandsAsync();
-        await ListenForEvents();
+        await SocketHelper.ListenForEvents();
     }
 
     /// <summary>
@@ -160,44 +158,6 @@ public class DiscordClient
     }
 
     #region Private Methods
-    internal async Task ListenForEvents()
-    {
-        var buffer = new byte[1024];
-        var messageBuffer = new StringBuilder();
-
-        while (_socket.State == WebSocketState.Open)
-        {
-            var result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (result.MessageType != WebSocketMessageType.Text) continue;
-            
-            messageBuffer.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-            if (!result.EndOfMessage) continue;
-                
-            try
-            {
-                var message = messageBuffer.ToString();
-                var json = JsonDocument.Parse(message);
-                
-                var opCode = json.RootElement.GetProperty("op").GetInt32();
-                var eventName = json.RootElement.GetProperty("t").GetString();
-                var payload = json.RootElement.GetProperty("d");
-
-                // either way works, not sure which one is rathered tho. 
-                //if (eventName == "INTERACTION_CREATE")
-                //    await EventRegistry.DispatchAsync(eventName, payload);
-
-                if (!string.IsNullOrWhiteSpace(eventName) || eventName is not null)
-                    await EventRegistry.DispatchAsync(eventName, payload);
-
-                messageBuffer.Clear();
-            }
-            catch (JsonException ex)
-            {
-                Log.Error($"Error parsing JSON: {ex.Message}");
-            }
-        }
-    }
-
     internal static async Task<string> GetCurrentIdAsync(string token)
     {
         var response = await HttpHelper.SendRequestAsync("/users/@me", "GET");

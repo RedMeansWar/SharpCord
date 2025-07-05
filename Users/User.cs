@@ -24,6 +24,7 @@
 #endregion
 
 using System.Text.Json;
+using SharpCord.Helpers;
 using SharpCord.Interactions;
 using SharpCord.Models;
 using SharpCord.Utils;

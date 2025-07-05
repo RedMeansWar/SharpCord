@@ -30,6 +30,7 @@ using System.Text.Json.Serialization;
 using SharpCord.Models;
 using SharpCord.Utils;
 using SharpCord.Interactions;
+using SharpCord.Helpers;
 
 namespace SharpCord.Guild;
 

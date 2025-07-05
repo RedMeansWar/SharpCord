@@ -24,6 +24,7 @@
 #endregion
 
 using System.Net.Http.Headers;
+using SharpCord.Helpers;
 using SharpCord.Utils;
 
 namespace SharpCord.Users;

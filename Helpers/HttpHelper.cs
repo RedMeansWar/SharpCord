@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using SharpCord.Utils;
 
-namespace SharpCord
+namespace SharpCord.Helpers
 {
     /// <summary>
     /// SharpCord HTTP Helper, made for sending requests a bit easier.

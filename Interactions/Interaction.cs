@@ -27,6 +27,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using SharpCord.Helpers;
 using SharpCord.Models;
 using SharpCord.Types;
 using SharpCord.Utils;
