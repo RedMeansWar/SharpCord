@@ -130,7 +130,7 @@ public static class EventRegistry
         if (interaction?.Data?.Name is not null && interaction.Type == BaseInteractionType.ApplicationCommand)
         {
             var commandName = interaction.Data.Name.ToLower();
-            if (CommandRegistry.SlashCommands.TryGetValue(commandName, out var method) && CommandRegistry.SlashCommands.TryGetValue(commandName, out var instance))
+            if (CommandRegistry.SlashCommands.TryGetValue(commandName, out var method) && CommandRegistry.CommandInstances.TryGetValue(commandName, out var instance))
             {
                 try
                 {

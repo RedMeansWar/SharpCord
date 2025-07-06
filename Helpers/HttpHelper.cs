@@ -24,8 +24,16 @@ namespace SharpCord.Helpers
         public static void InitializeHelper(HttpClient http)
         {
             _httpClient = http;
-            _httpClient.DefaultRequestHeaders.Authorization = new("Bot", DiscordClient.Token);
+
+            SetHeader("Authorization", $"Bot {DiscordClient.Token}");
         }
+
+        /// <summary>
+        /// Sets your own header.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void SetHeader(string key, string value) => _httpClient.DefaultRequestHeaders.Add(key, value);
 
         /// <summary>
         /// Sends an HTTP request to the Discord API using the provided method and optional body payload.

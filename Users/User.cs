@@ -37,6 +37,36 @@ namespace SharpCord.Users;
 public class User
 {
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="guildId"></param>
+    /// <param name="userId"></param>
+    /// <param name="reason"></param>
+    /// <param name="logging"></param>
+    /// <returns>If kick was successful or not.</returns>
+    public static async Task<bool> KickAsync(string guildId, string userId, string reason, bool logging = false)
+    {
+        string url = $"/guilds/{guildId}/members/{userId}";
+
+        HttpHelper.SetHeader("X-Audit-Log-Reason", reason);
+        HttpResponseMessage res = await HttpHelper.SendRequestAsync(url, "DELETE");
+
+        if (!res.IsSuccessStatusCode)
+        {
+            Log.Error($"Failed to kick user from guild: {res.StatusCode}\n{res.Content.ReadAsStringAsync()}");
+
+            return false;
+        }
+
+        if (logging)
+        {
+            Log.Warning($"Successfully kicked {userId} from {guildId}");
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Checks if a user has the specified permission for a given guild.
     /// </summary>
     /// <param name="guildId">The identifier of the guild where the permission will be checked.</param>
@@ -121,6 +151,7 @@ public class User
     /// </summary>
     /// <param name="interaction"></param>
     /// <param name="roleId"></param>
+    /// <param name="logging"></param>
     public static async Task AssignRoleAsync(Interaction interaction, string roleId, bool logging = false)
     {
         var url = $"/guilds/{interaction.GuildId}/members/{interaction.User?.Id}/roles/{roleId}";
