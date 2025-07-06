@@ -14,6 +14,7 @@
     <ItemGroup>
       <PackageReference Include="Concentus" Version="2.2.2" />
       <PackageReference Include="NaCl.Core" Version="2.0.6" />
+      <PackageReference Include="Sodium.Core" Version="1.4.0" />
     </ItemGroup>
 
 </Project>

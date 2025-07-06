@@ -5,26 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|c:\\users\\trent\\desktop\\[development]\\[sharpcord]\\sharpcord\\voice\\voiceclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|solutionrelative:voice\\voiceclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|c:\\users\\trent\\desktop\\[development]\\[sharpcord]\\sharpcord\\payloads\\rtpheaderpayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|solutionrelative:payloads\\rtpheaderpayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|c:\\users\\trent\\desktop\\[development]\\[sharpcord]\\sharpcord\\payloads\\voiceserverupdatepayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|solutionrelative:payloads\\voiceserverupdatepayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|c:\\users\\trent\\desktop\\[development]\\[sharpcord]\\sharpcord\\payloads\\voicestateupdatepayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|solutionrelative:payloads\\voicestateupdatepayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|c:\\users\\trent\\desktop\\[development]\\[sharpcord]\\sharpcord\\payloads\\createchannelpayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|solutionrelative:payloads\\createchannelpayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|c:\\users\\trent\\desktop\\[development]\\[sharpcord]\\sharpcord\\payloads\\commandpayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6D8BA387-99CC-4A1B-BBA8-1D60EBA69603}|SharpCord.csproj|solutionrelative:payloads\\commandpayload.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,73 +14,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "VoiceServerUpdatePayload.cs",
-              "DocumentMoniker": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\VoiceServerUpdatePayload.cs",
-              "RelativeDocumentMoniker": "Payloads\\VoiceServerUpdatePayload.cs",
-              "ToolTip": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\VoiceServerUpdatePayload.cs",
-              "RelativeToolTip": "Payloads\\VoiceServerUpdatePayload.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-06T21:06:50.176Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "CommandPayload.cs",
-              "DocumentMoniker": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\CommandPayload.cs",
-              "RelativeDocumentMoniker": "Payloads\\CommandPayload.cs",
-              "ToolTip": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\CommandPayload.cs",
-              "RelativeToolTip": "Payloads\\CommandPayload.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-06T20:54:38.192Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "CreateChannelPayload.cs",
-              "DocumentMoniker": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\CreateChannelPayload.cs",
-              "RelativeDocumentMoniker": "Payloads\\CreateChannelPayload.cs",
-              "ToolTip": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\CreateChannelPayload.cs",
-              "RelativeToolTip": "Payloads\\CreateChannelPayload.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-06T20:54:22.663Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "VoiceStateUpdatePayload.cs",
-              "DocumentMoniker": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\VoiceStateUpdatePayload.cs",
-              "RelativeDocumentMoniker": "Payloads\\VoiceStateUpdatePayload.cs",
-              "ToolTip": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\VoiceStateUpdatePayload.cs",
-              "RelativeToolTip": "Payloads\\VoiceStateUpdatePayload.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-06T20:54:18.492Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "RtpHeaderPayload.cs",
-              "DocumentMoniker": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\RtpHeaderPayload.cs",
-              "RelativeDocumentMoniker": "Payloads\\RtpHeaderPayload.cs",
-              "ToolTip": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Payloads\\RtpHeaderPayload.cs",
-              "RelativeToolTip": "Payloads\\RtpHeaderPayload.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAiAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-06T20:53:34.133Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -109,9 +24,9 @@
               "RelativeDocumentMoniker": "Voice\\VoiceClient.cs",
               "ToolTip": "C:\\Users\\trent\\Desktop\\[Development]\\[SharpCord]\\SharpCord\\Voice\\VoiceClient.cs",
               "RelativeToolTip": "Voice\\VoiceClient.cs",
-              "ViewState": "AgIAAL8AAAAAAAAAAAAAwM0AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAGcAAAAAAAAAAAAIwIIAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-06T20:09:27.293Z",
+              "WhenOpened": "2025-07-06T22:03:42.544Z",
               "EditorCaption": ""
             }
           ]
