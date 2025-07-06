@@ -31,4 +31,10 @@ public class VoiceStateUpdatePayload
     /// </summary>
     [JsonPropertyName("self_deaf")]
     public bool SelfDeaf { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [JsonPropertyName("session_id")]
+    public string SessionId { get; set; } = string.Empty;
 }

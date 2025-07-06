@@ -96,11 +96,12 @@ public class DiscordClient
     public async Task LoginAsync()
     {
         HttpHelper.InitializeHelper(new());
-        SocketHelper.InitalizeHelper();
+        //SocketHelper.InitalizeHelper();
+        SocketHelper socket = new();
 
         Id = await GetCurrentIdAsync(Token);
 
-        await SocketHelper.ConnectAsync();
+        await socket.ConnectAsync("wss://gateway.discord.gg/?v=10&encoding=json");
 
         var identifyPayload = new
         {
@@ -120,13 +121,13 @@ public class DiscordClient
 
         var json = JsonSerializer.Serialize(identifyPayload);
 
-        await SocketHelper.SendMessageAsync(json);
+        await socket.SendMessageAsync(json);
         
         Log.Info("Successfully Logged in.");
         Log.Info($"Found {CommandRegistry.SlashCommands.Count} application (/) commands.");
 
         await CommandRegistry.RegisterAllSlashCommandsAsync();
-        await SocketHelper.ListenForEvents();
+        await socket.ListenForEvents();
     }
 
     #region Private Methods

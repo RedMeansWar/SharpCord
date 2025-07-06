@@ -15,17 +15,19 @@ namespace SharpCord.Helpers
     /// </summary>
     public class SocketHelper
     {
+        private byte[] _buffer = new byte[4096];
+
         private static ClientWebSocket? _socket;
 
         /// <summary>
         /// 
         /// </summary>
         public static bool IsConnected => _socket.State == WebSocketState.Open;
-
+        
         /// <summary>
         /// 
         /// </summary>
-        public static void InitalizeHelper()
+        public SocketHelper()
         {
             if (_socket is null)
             {
@@ -36,21 +38,23 @@ namespace SharpCord.Helpers
         /// <summary>
         /// 
         /// </summary>
-        public static async Task ConnectAsync()
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public  async Task ConnectAsync(string url)
         {
             if (IsConnected)
             {
                 return;
             }
 
-            await _socket.ConnectAsync(new("wss://gateway.discord.gg/?v=10&encoding=json"), CancellationToken.None);
+            await _socket.ConnectAsync(new(url), CancellationToken.None);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="json"></param>
-        public static async Task SendMessageAsync(string json)
+        public async Task SendMessageAsync(string json)
         {
             if (!IsConnected)
             {
@@ -65,9 +69,19 @@ namespace SharpCord.Helpers
         /// <summary>
         /// 
         /// </summary>
-        public static async Task ListenForEvents()
+        /// <returns></returns>
+        public async Task<JsonElement> ReceiveMessageAsync()
         {
-            byte[] buffer = new byte[4096];
+            WebSocketReceiveResult res = await _socket.ReceiveAsync(_buffer, CancellationToken.None);
+
+            return JsonSerializer.Deserialize<JsonElement>(_buffer[..res.Count])!;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public  async Task ListenForEvents()
+        {
             StringBuilder messagBuilder = new();
 
             while (IsConnected)
@@ -78,7 +92,7 @@ namespace SharpCord.Helpers
 
                     do
                     {
-                        res = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        res = await _socket.ReceiveAsync(new ArraySegment<byte>(_buffer), CancellationToken.None);
 
                         if (res.MessageType == WebSocketMessageType.Close)
                         {
@@ -87,7 +101,7 @@ namespace SharpCord.Helpers
                             return;
                         }
 
-                        messagBuilder.Append(Encoding.UTF8.GetString(buffer, 0, res.Count));
+                        messagBuilder.Append(Encoding.UTF8.GetString(_buffer, 0, res.Count));
                     }
                     while (!res.EndOfMessage);
 

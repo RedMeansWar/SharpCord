@@ -23,14 +23,22 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Reflection.PortableExecutable;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Concentus;
+using Concentus.Enums;
+using Concentus.Structs;
 using SharpCord.Helpers;
 using SharpCord.Models;
+using SharpCord.Payloads;
 using SharpCord.Types;
 using SharpCord.Utils;
+using Sodium;
 
 namespace SharpCord.Voice;
 
@@ -42,6 +50,20 @@ public class VoiceClient : BaseInteraction
     private string _token;
     private readonly Snowflake _guildId;
     private readonly Snowflake _channelId;
+
+    private string? _voiceEndpoint;
+    private string? _sessionId;
+    private string? _voiceToken;
+    private string? _voiceIp;
+
+    private int _voicePort;
+    private int _ssrc;
+
+    private byte[] _secretKey = Array.Empty<byte>();
+
+    private UdpClient _udpClient;
+    private OpusEncoder _encoder;
+    private SocketHelper _socketHelper = new();
     
     /// <summary>
     /// 
@@ -63,7 +85,13 @@ public class VoiceClient : BaseInteraction
     /// <summary>
     /// 
     /// </summary>
-    public async Task ConnectAsync() => await SocketHelper.ConnectAsync();
+    /// <param name="payload"></param>
+    public void HandleVoiceStateUpdate(VoiceStateUpdatePayload payload) => _sessionId = payload.SessionId;// not sure where this and "HandleVoiceServerUpdate" is supposed to go so im just leaving it unused atm
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public async Task ConnectAsync() => await _socketHelper.ConnectAsync($"wss://{_voiceEndpoint}?v=4");
 
     /// <summary>
     /// 
@@ -91,7 +119,7 @@ public class VoiceClient : BaseInteraction
         };
 
         var json = JsonSerializer.Serialize(payload);
-        await SocketHelper.SendMessageAsync(json);
+        await _socketHelper.SendMessageAsync(json);
     }
 
     /// <summary>
@@ -117,7 +145,23 @@ public class VoiceClient : BaseInteraction
         };
         
         var json = JsonSerializer.Serialize(payload);
-        await SocketHelper.SendMessageAsync(json);
+        await _socketHelper.SendMessageAsync(json);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="payload"></param>
+    /// <returns></returns>
+    public async Task HandleVoiceServerUpdate(VoiceServerUpdatePayload payload)
+    {
+        _voiceToken = payload.Token;
+        _voiceEndpoint = payload.Endpoint;
+
+        if (_voiceEndpoint is not null && _sessionId is not null && _voiceToken is not null)
+        {
+            await StartConnectionAsync();
+        }
     }
 
     /// <summary>
@@ -126,7 +170,9 @@ public class VoiceClient : BaseInteraction
     /// <param name="filePath"></param>
     public async Task PlayAsync(string filePath)
     {
-        
+        using FileStream fs = File.OpenRead(filePath);
+
+        await PlayAsync(fs);
     }
 
     /// <summary>
@@ -135,6 +181,168 @@ public class VoiceClient : BaseInteraction
     /// <param name="audioStream"></param>
     public async Task PlayAsync(Stream audioStream)
     {
-        
+        if (_udpClient is null || _encoder is null || _secretKey.Length == 0)
+        {
+            return;
+        }
+
+        byte[] buffer = new byte[3840];
+        byte[] encoded = new byte[4000];
+        byte[] nonce = new byte[24];
+
+        short[] pcm = new short[960 * 2];
+
+        int seqence = 0;
+        uint timestamp = 0;
+
+        while (true)
+        {
+            int read = await audioStream.ReadAsync(buffer);
+
+            if (read == 0)
+            {
+                break;
+            }
+
+            Buffer.BlockCopy(buffer, 0, pcm, 0, read);
+
+            int encodedLen = _encoder.Encode(pcm, 0, 960, encoded, 0, encoded.Length);
+
+            var header = new RtpHeaderPayload
+            {
+                Version = 2,
+                Padding = false,
+                Extension = false,
+                CsrcCount = 0,
+                Marker = false,
+                PayloadType = 0,
+                Timestamp = timestamp += 960,
+                SequenceNumber = (ushort)seqence++,
+                Ssrc = (uint)_ssrc,
+                Csrc = Array.Empty<uint>()
+            };
+
+            byte[] rtpHeader = BuildRtpHeader(header);
+            byte[] nonceFull = new byte[24];
+
+            Array.Copy(rtpHeader, nonceFull, 12);
+
+            byte[] encrypted = SecretBox.Create(encoded[..encodedLen], nonceFull, _secretKey);
+
+            byte[] packet = new byte[12 + encrypted.Length];
+
+            Array.Copy(rtpHeader, packet, 12);
+            Array.Copy(encrypted, 0, packet, 12, encrypted.Length);
+
+            await _udpClient.SendAsync(packet);
+            await Task.Delay(20);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task StartConnectionAsync()
+    {
+        await ConnectAsync();
+
+        var identity = new
+        {
+            op = 0,
+            d = new
+            {
+                server_id = _guildId,
+                user_id = DiscordClient.Id,
+                session_id = _sessionId,
+                token = _voiceToken
+            }
+        };
+
+        await _socketHelper.SendMessageAsync(JsonSerializer.Serialize(identity));
+
+        JsonElement json = await _socketHelper.ReceiveMessageAsync();
+
+        _ssrc = json.GetProperty("d").GetProperty("ssrc").GetInt32();
+        _voicePort = json.GetProperty("d").GetProperty("port").GetInt32();
+        _voiceIp = json.GetProperty("d").GetProperty("ip").GetString();
+
+        await PerformUdpDiscovery();
+
+        var selectProtocol = new
+        {
+            op = 1,
+            d = new
+            {
+                protocol = "udp",
+                data = new
+                {
+                    address = _voiceIp,
+                    port = _voicePort,
+                    mode = "xsalsa20_poly1305"
+                }
+            }
+        };
+
+        await _socketHelper.SendMessageAsync(JsonSerializer.Serialize(selectProtocol));
+
+        JsonElement secret = await _socketHelper.ReceiveMessageAsync();
+
+        _secretKey = secret.GetProperty("d").GetProperty("secret_key").EnumerateArray().Select(x => (byte)x.GetInt32()).ToArray();
+
+        _encoder = (OpusEncoder)OpusCodecFactory.CreateEncoder(48000, 2, OpusApplication.OPUS_APPLICATION_AUDIO);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task PerformUdpDiscovery()
+    {
+        _udpClient = new();
+        _udpClient.Connect(_voiceIp, _voicePort);
+
+        byte[] packet = new byte[70];
+
+        BinaryPrimitives.WriteUInt32BigEndian(packet.AsSpan(0, 4), (uint)_ssrc);
+        await _udpClient.SendAsync(packet);
+
+        UdpReceiveResult res = await _udpClient.ReceiveAsync();
+
+        string externalIp = Encoding.UTF8.GetString(res.Buffer, 4, 64).TrimEnd('\0');
+        int port = BinaryPrimitives.ReadUInt16BigEndian(res.Buffer.AsSpan(68, 2));
+
+        _voiceIp = externalIp;
+        _voicePort = port;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="headerPayload"></param>
+    /// <returns></returns>
+    private byte[] BuildRtpHeader(RtpHeaderPayload headerPayload)
+    {
+        int headerSize = 12 + headerPayload.Csrc.Length * 4;
+        byte[] rtpHeaderBytes = new byte[headerSize];
+
+        rtpHeaderBytes[0] = (byte)((headerPayload.Version << 6) |
+            (headerPayload.Padding ? 1 << 5 : 0) |
+            (headerPayload.Extension ? 1 << 4 : 0) |
+            headerPayload.CsrcCount);
+
+        rtpHeaderBytes[1] = (byte)((headerPayload.Marker ? 1 << 7 : 0) |
+        headerPayload.PayloadType);
+
+        BinaryPrimitives.WriteUInt16BigEndian(rtpHeaderBytes.AsSpan(2), headerPayload.SequenceNumber);
+        BinaryPrimitives.WriteUInt32BigEndian(rtpHeaderBytes.AsSpan(4), headerPayload.Timestamp);
+        BinaryPrimitives.WriteUInt32BigEndian(rtpHeaderBytes.AsSpan(8), headerPayload.Ssrc);
+
+        for (int i = 0; i < headerPayload.Csrc.Length; i++)
+        {
+            BinaryPrimitives.WriteUInt32BigEndian(rtpHeaderBytes.AsSpan(12 + i * 4), headerPayload.Csrc[i]);
+        }
+
+        return rtpHeaderBytes;
     }
 }
