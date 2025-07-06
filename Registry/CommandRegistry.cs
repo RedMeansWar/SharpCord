@@ -88,7 +88,7 @@ public static class CommandRegistry
     /// Registers all slash commands defined in the application by sending payloads to the Discord API.
     /// </summary>
     /// <remarks>
-    /// This method iterates through all commands stored in <see cref="SharpCord.Commands.CommandRegistry.SlashCommands"/>.
+    /// This method iterates through all commands stored in <see cref="SharpCord.Registry.CommandRegistry.SlashCommands"/>.
     /// For each command, it retrieves metadata from the associated <see cref="SharpCord.Attributes.CommandAttribute"/> and
     /// constructs a corresponding payload. The payload is then serialized into JSON format and posted to the appropriate
     /// Discord API endpoint, differentiating between guild-specific and global commands based on the presence of a GuildId.
@@ -105,6 +105,7 @@ public static class CommandRegistry
             var attr = method.GetCustomAttribute<CommandAttribute>();
             if (attr is null) continue;
 
+            // construct the slash command data
             var payload = new CommandPayload
             {
                 Name = attr.Name,
@@ -112,17 +113,21 @@ public static class CommandRegistry
                 Type = attr.Type,
                 DefaultMemberPermissions = attr.DefaultMemberPermissions,
                 DMPermission = attr.DMPermission,
-                NSFW = attr.NSFW,
+                Nsfw = attr.Nsfw,
             };
 
+            // attach any options
             if (CommandOptions.TryGetValue(command.Key, out var options))
                 payload.Options = options;
 
             var appId = DiscordClient.GetApplicationIdFromToken();
-            var url = attr.GuildId is not null
-                ? $"/applications/{appId}/guilds/{attr.GuildId}/commands"
-                : $"/applications/{appId}/commands";
+            var guildId = attr.GuildId?.ToString(); // convert the string into a snowflake value
+            
+            var url = guildId is not null
+                ? $"/applications/{appId}/guilds/{guildId}/commands" // guild commands
+                : $"/applications/{appId}/commands"; // global commands
 
+            // send the request to the Discord API for registration
             var response = await HttpHelper.SendRequestAsync(url, "POST", payload);
             if (!response.IsSuccessStatusCode)
             {
@@ -133,7 +138,7 @@ public static class CommandRegistry
             Log.Info($"✅ Slash command '{payload.Name}' registered.");
         }
     }
-
+    
     /// <summary>
     /// Registers commands defined in the specified type, identifying methods marked with
     /// <see cref="SharpCord.Attributes.CommandAttribute"/> and <see cref="SharpCord.Attributes.PrefixCommandAttribute"/>.

@@ -10,12 +10,21 @@ using System.Threading.Tasks;
 
 namespace SharpCord.Helpers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SocketHelper
     {
         private static ClientWebSocket? _socket;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static bool IsConnected => _socket.State == WebSocketState.Open;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static void InitalizeHelper()
         {
             if (_socket is null)
@@ -24,6 +33,9 @@ namespace SharpCord.Helpers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static async Task ConnectAsync()
         {
             if (IsConnected)
@@ -34,6 +46,10 @@ namespace SharpCord.Helpers
             await _socket.ConnectAsync(new("wss://gateway.discord.gg/?v=10&encoding=json"), CancellationToken.None);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="json"></param>
         public static async Task SendMessageAsync(string json)
         {
             if (!IsConnected)
@@ -46,6 +62,9 @@ namespace SharpCord.Helpers
             await _socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static async Task ListenForEvents()
         {
             byte[] buffer = new byte[4096];

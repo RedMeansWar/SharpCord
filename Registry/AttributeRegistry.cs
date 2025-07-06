@@ -49,26 +49,11 @@ public static class AttributeRegistry
             {
                 switch (attribute)
                 {
+                    case ModalAttribute modalAttr:
                     case CreateChannelAttribute createChannelAttr:
-                        RegisteredActions.Add(method);
-                        Log.Info($"Registered CreateChannel action for Guild: {createChannelAttr.GuildId}, Name: {createChannelAttr.Name}");
-                        break;
-                    
                     case DeleteChannelAttribute deleteChannelAttr:
-                        RegisteredActions.Add(method);
-                        Log.Info($"Registered DeleteChannel action for Guild: {deleteChannelAttr.GuildId}, ChannelId: {deleteChannelAttr.ChannelId}");
-                        break;
-
                     case AssignRoleAttribute assignRoleAttr:
-                        RegisteredActions.Add(method);
-                        Log.Info($"Registered AssignRole action for Guild: {assignRoleAttr.GuildId}, RoleId: {assignRoleAttr.RoleId}");
-                        break;
-                    
-                    case IfUserHasPermissionAttribute userHasPermissionAttr:
-                        RegisteredActions.Add(method);
-                        Log.Info($"Registered IfUserHasPermission action for Guild: {userHasPermissionAttr.GuildId}, Permission: {userHasPermissionAttr.Permission}");
-                        break;
-                    
+                    case IfUserHasPermissionAttribute userHasPermissionAttr: RegisteredActions.Add(method); break;
                     default: Log.Warning($"Unknown attribute type: {attribute.GetType().Name}"); break;
                 }
             }

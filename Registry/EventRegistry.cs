@@ -40,7 +40,7 @@ namespace SharpCord.Registry;
 public static class EventRegistry
 {
     internal static readonly Dictionary<string, List<MethodInfo>> Handlers = new();
-    private static readonly Dictionary<string, object> EventInstances = new();
+    internal static readonly Dictionary<string, object> EventInstances = new();
     
     /// <summary>
     /// Registers all methods within the specified type as event handlers
@@ -92,30 +92,8 @@ public static class EventRegistry
 
         if (evt == DiscordEvents.InteractionCreate)
         {
-            var interaction = JsonSerializer.Deserialize<Interaction>(payload.GetRawText());
-            if (interaction?.Data?.Name is not null && interaction.Type == BaseInteractionType.ApplicationCommand)
-            {
-                var commandName = interaction.Data.Name.ToLower();
-                if (CommandRegistry.SlashCommands.TryGetValue(commandName, out var method) &&
-                    CommandRegistry.CommandInstances.TryGetValue(commandName, out var instance))
-                {
-                    try
-                    {
-                        Log.Warning($"Executing slash command: /{commandName}");
-                        method.Invoke(instance, [interaction]);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error($"Failed to execute slash command: /{commandName}\n{ex}");
-                    }
-                }
-                else
-                {
-                    Log.Warning($"Slash command /{commandName} not found in registry.");
-                }
-
-                return;
-            }
+            await HandleInteractionCreate(payload);
+            return;
         }
         
         if (!Handlers.TryGetValue(eventName, out var methods))
@@ -126,39 +104,59 @@ public static class EventRegistry
             var instance = EventInstances[eventName];
             var parameters = method.GetParameters();
 
-            if (parameters.Length == 0)
+            try
             {
-                var result = method.Invoke(instance, null);
+                var arg = parameters.Length == 0 ? null: await GetMethodArgumentAsync(payload, parameters[0]);
+                if (parameters.Length > 0 && arg is null)
+                {
+                    Log.Warning($"Event '{eventName}' handler method '{method.Name}' expects arguments, but none were provided or is invalid.");
+                    continue;
+                }
+                
+                var result = method.Invoke(instance, arg is null ? null : [arg]);
                 if (result is Task task)
                     await task;
             }
-            else
+            catch (Exception ex)
             {
-                // If method expects payload, e.g., JsonElement or specific object
-                object? arg = payload;
-
-                if (parameters[0].ParameterType == typeof(JsonElement))
+                Log.Error($"Failed to invoke event handler '{method.Name}' for event '{eventName}': {ex.Message}");
+            }
+        }
+    }
+    
+    private static async Task HandleInteractionCreate(JsonElement payload)
+    {
+        var interaction = JsonSerializer.Deserialize<Interaction>(payload.GetRawText());
+        if (interaction?.Data?.Name is not null && interaction.Type == BaseInteractionType.ApplicationCommand)
+        {
+            var commandName = interaction.Data.Name.ToLower();
+            if (CommandRegistry.SlashCommands.TryGetValue(commandName, out var method) && CommandRegistry.SlashCommands.TryGetValue(commandName, out var instance))
+            {
+                try
                 {
-                    arg = payload;
+                    method.Invoke(instance, [interaction]);
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        arg = JsonSerializer.Deserialize(payload.GetRawText(), parameters[0].ParameterType);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to deserialize event payload for {eventName}: {ex.Message}");
-                        continue;
-                    }
+                    Log.Error($"Failed to execute slash command: /{commandName}\n{ex}");
                 }
-
-                var result = method.Invoke(instance, [arg]);
-                if (result is Task task)
-                    await task;
             }
         }
     }
 
+    private static async Task<object?> GetMethodArgumentAsync(JsonElement payload, ParameterInfo parameter)
+    {
+        if (parameter.ParameterType == typeof(JsonElement))
+            return payload;
+
+        try
+        {
+            return JsonSerializer.Deserialize(payload.GetRawText(), parameter.ParameterType);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to deserialize event payload for parameter '{parameter.Name}' to type '{parameter.ParameterType.Name}': {ex.Message}");
+            return null;
+        }
+    }
 }

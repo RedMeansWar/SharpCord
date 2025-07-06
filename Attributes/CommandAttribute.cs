@@ -24,17 +24,26 @@
 #endregion
 
 using SharpCord.Models;
+using SharpCord.Types;
 
 namespace SharpCord.Attributes;
 
 /// <summary>
 /// Specifies an attribute to define a command that can be used within the application.
 /// </summary>
+/// </param>
 /// <remarks>
 /// This attribute is applied to methods to define them as commands and includes metadata
 /// such as the command's name, description, permissions, context (DM or Guild), and more.
 /// </remarks>
-[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+/// <code>
+/// [Command("ping")]
+/// private async Task PingCommand(Interaction interaction)
+/// {
+///     await interaction.ReplyAsync("Pong!");
+/// }
+/// </code>
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class CommandAttribute : Attribute
 {
     /// <summary>
@@ -83,7 +92,7 @@ public class CommandAttribute : Attribute
     /// where NSFW content is permitted, ensuring compliance with application rules
     /// and user safety guidelines.
     /// </remarks>
-    public bool? NSFW { get; set; }
+    public bool? Nsfw { get; set; }
 
     /// <summary>
     /// Gets or sets the type of the application command.
@@ -103,15 +112,32 @@ public class CommandAttribute : Attribute
     /// If not provided, the command might be treated as global and available across all eligible guilds.
     /// Providing a specific GuildId ensures that the command is restricted locally to that guild.
     /// </remarks>
-    public string? GuildId { get; set; }
+    public string? GuildIdRaw { get; set; } // the raw version of this because attributes don't support "Snowflake"
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public Snowflake? GuildId => GuildIdRaw is not null ? new Snowflake(GuildIdRaw) : null;
 
     /// <summary>
-    /// Represents an attribute to define an application (/) command.
+    /// 
     /// </summary>
+    /// <param name="name">The command name (e.g., "ping").</param>
+    /// <param name="description">The command description shown in Discord's UI.</param>
+    /// <param name="guildId">
+    /// (Optional) The guild ID this command is restricted to.
+    /// Must be passed as a string due to C#'s attribute limitations,
+    /// but internally it will be converted to a Snowflake for safety.
+    /// </param>
     /// <remarks>
     /// This attribute is used to annotate methods and provides metadata such as the command's
     /// name, description, permissions, context, and other optional details. It facilitates the
     /// definition and management of commands in the application.
     /// </remarks>
-    public CommandAttribute(string name) => Name = name;
+    public CommandAttribute(string name, string description = "", string? guildId = null)
+    {
+        Name = name;
+        Description = description;
+        GuildIdRaw = guildId;
+    }
 }

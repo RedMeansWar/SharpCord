@@ -23,6 +23,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
+using SharpCord.Types;
+
 namespace SharpCord.Attributes;
 
 /// <summary>
@@ -34,12 +36,12 @@ public class GuildCommandAttribute : CommandAttribute
     /// <summary>
     /// 
     /// </summary>
-    public string GuildId { get; }
+    public Snowflake GuildId { get; }
 
     /// <summary>
     /// /
     /// </summary>
     /// <param name="name"></param>
     /// <param name="guildId"></param>
-    public GuildCommandAttribute(string name, string guildId) : base(name) => GuildId = guildId;
+    public GuildCommandAttribute(string name, Snowflake guildId) : base(name) => GuildId = guildId;
 }
