@@ -31,6 +31,9 @@ using SharpCord.Models;
 using SharpCord.Utils;
 using SharpCord.Interactions;
 using SharpCord.Helpers;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading.Channels;
+using System.Runtime.CompilerServices;
 
 namespace SharpCord.Guild;
 
@@ -39,6 +42,32 @@ namespace SharpCord.Guild;
 /// </summary>
 public class Channel
 {
+    /// <summary>
+    /// Asynchronously sends a specified message in a specified channel.
+    /// </summary>
+    /// <param name="channelId"></param>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    public static async Task SendMessageAsync(string channelId, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        var payload = new
+        {
+            content = message
+        };
+
+        HttpResponseMessage res = await HttpHelper.SendRequestAsync($"/channels/{channelId}/messages", "POST", payload);
+
+        if (!res.IsSuccessStatusCode)
+        {
+            Log.Error($"Failed to send message in channel: {res.StatusCode}\n{await res.Content.ReadAsStringAsync()}");
+        }
+    }
+
     /// <summary>
     /// Asynchronously creates a new channel with the specified parameters.
     /// </summary>
@@ -125,4 +154,34 @@ public class Channel
         
         Log.Info($"✅ Deleted channel '{channelId}' in.");
     }
+
+    // CURRENTLY BROKEN
+    /// <returns></returns>
+    //public static async Task<BaseChannel?> GetChannelAsync(string channelId)
+    //{
+    //    HttpResponseMessage res = await HttpHelper.SendRequestAsync($"/channels/{channelId}");
+
+    //    if (!res.IsSuccessStatusCode)
+    //    {
+    //        Log.Error($"Could not get channel: {res.StatusCode}\n{await res.Content.ReadAsStringAsync()}");
+
+    //        return null;
+    //    }
+
+    //    return JsonSerializer.Deserialize<BaseChannel>(await res.Content.ReadAsStringAsync());
+    //}
+
+    //public static async Task<IReadOnlyList<BaseChannel>?> GetChannelsAsync(string guildId)
+    //{
+    //    HttpResponseMessage res = await HttpHelper.SendRequestAsync($"/guilds/{guildId}/channels");
+
+    //    if (!res.IsSuccessStatusCode)
+    //    {
+    //        Log.Error($"Could not get channels from guild: {res.StatusCode}\n{await res.Content.ReadAsStringAsync()}");
+
+    //        return null;
+    //    }
+
+    //    return JsonSerializer.Deserialize<IReadOnlyList<BaseChannel>>(await res.Content.ReadAsStringAsync());
+    //}
 }
