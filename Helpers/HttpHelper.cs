@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using SharpCord.Errors;
 using SharpCord.Utils;
 
 namespace SharpCord.Helpers
@@ -42,8 +43,9 @@ namespace SharpCord.Helpers
         /// <param name="method">The HTTP method to use (e.g., GET, POST, PUT). Defaults to "GET".</param>
         /// <param name="body">The optional body payload of the request. If provided, it will be serialized to JSON.</param>
         /// <param name="serializerOptions">Optional JSON serializer options for customizing serialization.</param>
+        /// <param name="headers">THe optional headers that you can add if the method requires them (mainly for audit logging).</param>
         /// <returns>Returns an instance of <see cref="HttpResponseMessage"/> representing the response from the API.</returns>
-        public static async Task<HttpResponseMessage> SendRequestAsync(string path, string method = "GET", object? body = null, JsonSerializerOptions? serializerOptions = null)
+        public static async Task<HttpResponseMessage> SendRequestAsync(string path, string method = "GET", object? body = null, JsonSerializerOptions? serializerOptions = null, Dictionary<string, string>? headers = null)
         {
             HttpRequestMessage req = new(new(method), $"https://discord.com/api/v10{path}");
 
@@ -58,13 +60,37 @@ namespace SharpCord.Helpers
                 req.Content = new StringContent(json, Encoding.UTF8, "application/json");
             }
 
+            if (headers is not null)
+            {
+                foreach (var header in headers)
+                {
+                    req.Headers.Add(header.Key, header.Value);
+                }
+            }
+            
             HttpResponseMessage res = await _httpClient.SendAsync(req);
+            string rawContent = await res.Content.ReadAsStringAsync();
+
+            if ((int)res.StatusCode == 429)
+            {
+                var doc = JsonDocument.Parse(rawContent);
+                double retryAfter = doc.RootElement.GetProperty("retry_after").GetDouble();
+                bool isGlobal = doc.RootElement.GetProperty("global").GetBoolean();
+                
+                Log.Warning($"⚠️ Rate Limit Reached! Scope: {(isGlobal ? "Global" : "Per-Route")}, Path: {path}, Retry After: {retryAfter:0.00}s");
+                await Task.Delay(TimeSpan.FromSeconds(retryAfter));
+                return await _httpClient.SendAsync(req); // retry the request after the cooldown
+            }
+            
             if (!res.IsSuccessStatusCode)
             {
-                string error = await res.Content.ReadAsStringAsync();
-                Log.Error($"Error sending request to the Discord API {res.StatusCode}: {error}");
+                int? code = Translator.TryExtractCode(rawContent);
+                string friendly = Translator.TranslateFromJson(rawContent);
+                
+                Log.Error($"[Discord API Error] Status: {res.StatusCode}, Message: {friendly}");
+                throw new DiscordException(res.StatusCode, friendly, code, rawContent);
             }
-
+            
             return res;
         }
     }

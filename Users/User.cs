@@ -1,32 +1,9 @@
-#region LICENSE
-// Copyright (c) 2025 RedMeansWar
-//
-// Permission is hereby granted, free of charge, to any person
-// obtaining a copy of this software and associated documentation
-// files (the "Software"), to deal in the Software without
-// restriction, including without limitation the rights to use,
-// copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following
-// conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
-#endregion
-
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SharpCord.Helpers;
 using SharpCord.Interactions;
 using SharpCord.Models;
+using SharpCord.Types;
 using SharpCord.Utils;
 
 namespace SharpCord.Users;
@@ -34,8 +11,26 @@ namespace SharpCord.Users;
 /// <summary>
 /// Represents a user in Discord, providing methods to manage user-related operations.
 /// </summary>
-public class User
+public class User : BaseUser
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public string Tag => $"{Username}#{Discriminator}";
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public string AvatarUrl => Avatar is not null ?
+        $"https://cdn.discordapp.com/avatars/{Id}/{Avatar}.png"
+        : $"https://cdn.discordapp.com/embed/avatars/{Id.Value % 5}.png";
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => Tag;
+    
     /// <summary>
     /// 
     /// </summary>
@@ -59,9 +54,7 @@ public class User
         }
 
         if (logging)
-        {
             Log.Warning($"Successfully kicked {userId} from {guildId}");
-        }
 
         return true;
     }
@@ -81,7 +74,7 @@ public class User
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
-            Log.Error($"Failed to fetch member permissions: {response.StatusCode}\n{body}");
+            Log.Error($"❌ Failed to fetch member permissions: {response.StatusCode}\n{body}");
             return false;
         }
         
@@ -95,7 +88,7 @@ public class User
         if (!rolesResponse.IsSuccessStatusCode)
         {
             var body = await rolesResponse.Content.ReadAsStringAsync();
-            Log.Error($"Failed to fetch guild roles: {rolesResponse.StatusCode}\n{body}");
+            Log.Error($"❌ Failed to fetch guild roles: {rolesResponse.StatusCode}\n{body}");
             return false;
         }
         

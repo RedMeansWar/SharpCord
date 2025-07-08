@@ -1,28 +1,3 @@
-#region LICENSE
-// Copyright (c) 2025 RedMeansWar
-//
-// Permission is hereby granted, free of charge, to any person
-// obtaining a copy of this software and associated documentation
-// files (the "Software"), to deal in the Software without
-// restriction, including without limitation the rights to use,
-// copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following
-// conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
-#endregion
-
 using System.Buffers.Binary;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -86,7 +61,8 @@ public class VoiceClient : BaseInteraction
     /// 
     /// </summary>
     /// <param name="payload"></param>
-    public void HandleVoiceStateUpdate(VoiceStateUpdatePayload payload) => _sessionId = payload.SessionId;// not sure where this and "HandleVoiceServerUpdate" is supposed to go so im just leaving it unused atm
+    public void HandleVoiceStateUpdate(VoiceStateUpdatePayload payload) 
+        => _sessionId = payload.SessionId;// not sure where this and "HandleVoiceServerUpdate" is supposed to go so im just leaving it unused atm
 
     /// <summary>
     /// 
@@ -171,7 +147,6 @@ public class VoiceClient : BaseInteraction
     public async Task PlayAsync(string filePath)
     {
         using FileStream fs = File.OpenRead(filePath);
-
         await PlayAsync(fs);
     }
 
@@ -290,7 +265,7 @@ public class VoiceClient : BaseInteraction
 
         _secretKey = secret.GetProperty("d").GetProperty("secret_key").EnumerateArray().Select(x => (byte)x.GetInt32()).ToArray();
 
-        _encoder = (OpusEncoder)OpusCodecFactory.CreateEncoder(48000, 2, OpusApplication.OPUS_APPLICATION_AUDIO);
+        _encoder = (OpusEncoder)OpusCodecFactory.CreateEncoder(48000, 2);
     }
 
     /// <summary>

@@ -8,12 +8,12 @@ namespace SharpCord.Payloads;
 /// </summary>
 public class VoiceServerUpdatePayload
 {
-    [JsonPropertyName("")]
+    [JsonPropertyName("token")]
     public string Token { get; set; } = string.Empty;
     
-    [JsonPropertyName("")]
+    [JsonPropertyName("guild_id")]
     public Snowflake GuildId { get; set; }
     
-    [JsonPropertyName("")]
+    [JsonPropertyName("endpoint")]
     public string Endpoint { get; set; } = string.Empty;
 }

@@ -1,48 +1,11 @@
-#region LICENSE
-// Copyright (c) 2025 RedMeansWar
-//
-// Permission is hereby granted, free of charge, to any person
-// obtaining a copy of this software and associated documentation
-// files (the "Software"), to deal in the Software without
-// restriction, including without limitation the rights to use,
-// copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following
-// conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
-#endregion
-
 using SharpCord.Models;
 using SharpCord.Types;
 
 namespace SharpCord.Attributes;
 
 /// <summary>
-/// Specifies an attribute to define a command that can be used within the application.
+/// 
 /// </summary>
-/// </param>
-/// <remarks>
-/// This attribute is applied to methods to define them as commands and includes metadata
-/// such as the command's name, description, permissions, context (DM or Guild), and more.
-/// </remarks>
-/// <code>
-/// [Command("ping")]
-/// private async Task PingCommand(Interaction interaction)
-/// {
-///     await interaction.ReplyAsync("Pong!");
-/// }
-/// </code>
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class CommandAttribute : Attribute
 {
@@ -62,7 +25,7 @@ public class CommandAttribute : Attribute
     /// The description provides additional information about the purpose or functionality of the command.
     /// It is recommended to use a clear and concise description to ensure users understand its behavior.
     /// </remarks>
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; set; }
 
     /// <summary>
     /// Gets or sets the default permissions required for members to execute the command.
@@ -134,6 +97,13 @@ public class CommandAttribute : Attribute
     /// name, description, permissions, context, and other optional details. It facilitates the
     /// definition and management of commands in the application.
     /// </remarks>
+    /// <code>
+    /// [Command("ping")]
+    /// private async Task PingCommand(Interaction interaction)
+    /// {
+    ///     await interaction.ReplyAsync("Pong!");
+    /// }
+    /// </code>
     public CommandAttribute(string name, string description = "", string? guildId = null)
     {
         Name = name;
