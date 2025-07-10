@@ -61,5 +61,11 @@ public static class VoiceCodeTranslator
         throw new VoiceDisconnectException(code, $"Unknown voice disconnect reason (Code: {code})", false);
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="code"></param>
+    /// <param name="message"></param>
+    /// <returns></returns>
     public static bool TryGetValue(int code, out (string message, bool shouldReconnect) message) => VoiceCloseCodes.TryGetValue(code, out message);
 }

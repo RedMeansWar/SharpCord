@@ -1,16 +1,19 @@
 using System.Text.Json;
 using SharpCord.Helpers;
+using SharpCord.Messages;
 using SharpCord.Models;
 using SharpCord.Types;
 using SharpCord.Utils;
 
-namespace SharpCord.Guild;
+namespace SharpCord.Guilds;
 
 /// <summary>
 /// 
 /// </summary>
 public class Guild : BaseGuild
 {
+    public Message Message { get; set; }
+    
     /// <summary>
     /// 
     /// </summary>

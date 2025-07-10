@@ -9,6 +9,11 @@ namespace SharpCord.Utils;
 /// </summary>
 public static class Translator
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="json"></param>
+    /// <returns></returns>
     public static int? TryExtractCode(string json)
     {
         try
@@ -22,6 +27,11 @@ public static class Translator
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="json"></param>
+    /// <returns></returns>
     public static string TranslateFromJson(string json)
     {
         try
@@ -45,7 +55,12 @@ public static class Translator
             return $"Failed to parse Discord error JSON: {ex.Message}";
         }
     }
-
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
     public static int? ExtractCodeRecursive(JsonElement element)
     {
         if (element.ValueKind == JsonValueKind.Object)

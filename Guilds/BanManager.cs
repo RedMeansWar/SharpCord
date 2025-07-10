@@ -5,8 +5,11 @@ using SharpCord.Models;
 using SharpCord.Types;
 using SharpCord.Utils;
 
-namespace SharpCord.Guild;
+namespace SharpCord.Guilds;
 
+/// <summary>
+/// 
+/// </summary>
 public class BanManager
 {
     /// <summary>

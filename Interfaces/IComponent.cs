@@ -7,5 +7,8 @@ namespace SharpCord.Interfaces;
 /// </summary>
 public interface IComponent
 {
+    /// <summary>
+    /// 
+    /// </summary>
     ComponentType Type { get; set; }
 }

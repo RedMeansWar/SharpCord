@@ -1,4 +1,4 @@
-using SharpCord.Guild;
+using SharpCord.Guilds;
 using SharpCord.Models;
 
 namespace SharpCord.Extensions;

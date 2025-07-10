@@ -6,6 +6,10 @@ using SharpCord.Helpers;
 using SharpCord.Models;
 using SharpCord.Types;
 using SharpCord.Utils;
+using SharpCord.Guilds;
+using SharpCord.Users;
+using SharpCord.Messages;
+using Embed = SharpCord.Models.Embed;
 
 namespace SharpCord.Interactions;
 
@@ -14,6 +18,11 @@ namespace SharpCord.Interactions;
 /// </summary>
 public class Interaction : BaseInteraction
 {
+    public Message Message { get; set; } = new();
+    public Channel Channel { get; set; } = new();
+    public Guild Guild { get; set; } = new();
+    public User User { get; set; } = new();
+    
     /// <summary>
     /// Sends a response to a Discord interaction asynchronously.
     /// </summary>
@@ -281,7 +290,7 @@ public class Interaction : BaseInteraction
             throw new Exception($"Discord API returned error: {response.StatusCode}\n{error}");
         }
     }
-
+    
     /*public async Task SendEmbedWithComponentsAsync(string content, List<Embed>? embeds = null, List<ActionRow>? components = null, bool ephemeral = false)
     {
         var payload = new InteractionResponse
@@ -319,7 +328,7 @@ public class Interaction : BaseInteraction
     /// A <c>BaseUser</c> object representing the user associated with the interaction,
     /// or <c>null</c> if no user is available.
     /// </returns>
-    public BaseUser? GetUser()
+    public BaseUser GetUser()
     {
         return Member?.User ?? User;
     }
@@ -330,7 +339,7 @@ public class Interaction : BaseInteraction
     /// <returns>The Snowflake identifier of the user, or null if no user is associated.</returns>
     public Snowflake? GetUserId()
     {
-        return GetUser()?.Id;
+        return GetUser().Id;
     }
 
     /// <summary>

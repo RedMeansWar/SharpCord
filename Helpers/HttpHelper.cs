@@ -43,7 +43,7 @@ namespace SharpCord.Helpers
         /// <param name="method">The HTTP method to use (e.g., GET, POST, PUT). Defaults to "GET".</param>
         /// <param name="body">The optional body payload of the request. If provided, it will be serialized to JSON.</param>
         /// <param name="serializerOptions">Optional JSON serializer options for customizing serialization.</param>
-        /// <param name="headers">THe optional headers that you can add if the method requires them (mainly for audit logging).</param>
+        /// <param name="headers">The optional headers that you can add if the method requires them (mainly for audit logging).</param>
         /// <returns>Returns an instance of <see cref="HttpResponseMessage"/> representing the response from the API.</returns>
         public static async Task<HttpResponseMessage> SendRequestAsync(string path, string method = "GET", object? body = null, JsonSerializerOptions? serializerOptions = null, Dictionary<string, string>? headers = null)
         {

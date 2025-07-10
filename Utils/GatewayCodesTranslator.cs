@@ -30,10 +30,21 @@ public static class GatewayCodesTranslator
         [4021] = "Voice session timeout — reconnect required."
     };
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="code"></param>
+    /// <returns></returns>
     public static string Translate(int code)
         => GatewayCloseCodes.TryGetValue(code, out var message)
             ? $"[Gateway Code {code}] {message}"
             : $"[Gateway Code {code}] Unknown gateway error code.";
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="code"></param>
+    /// <param name="message"></param>
+    /// <returns></returns>
     public static bool TryGetValue(int code, out string message) => GatewayCloseCodes.TryGetValue(code, out message);
 }

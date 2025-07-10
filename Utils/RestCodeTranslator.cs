@@ -1,5 +1,8 @@
 namespace SharpCord.Utils
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class RestCodeTranslator
     {
         public static Dictionary<int, string> RestCodes = new()
@@ -13,11 +16,22 @@ namespace SharpCord.Utils
             [50035] = "Invalid form body — one or more fields are wrong."
         };
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static string Translate(int code)
             => RestCodes.TryGetValue(code, out var message)
                 ? $"[REST Code {code}] {message}"
                 : $"[REST Code {code}] Unknown REST error code.";
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static bool TryGetValue(int code, out string message) => RestCodes.TryGetValue(code, out message);
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace SharpCord.Types;
 
@@ -161,9 +162,69 @@ public readonly struct Snowflake : IEquatable<Snowflake>, IComparable<Snowflake>
     }
 
     /// <summary>
-    /// 
+    /// Check if a snowflake's value of is empty or is 0.
     /// </summary>
     public bool IsEmpty => Value == 0;
+
+    /// <summary>
+    /// Tries to parse a Snowflake from a Discord mention string, such as &lt;@123456789&gt; or &lt;@!123456789&gt;.
+    /// </summary>
+    /// <param name="mention">The Discord mention string.</param>
+    /// <param name="result">The parsed Snowflake if successful; otherwise, default.</param>
+    /// <returns>True if parsing was successful; otherwise, false.</returns>
+    public bool TryParseMention(string mention, out Snowflake result)
+    {
+        result = default;
+        if (string.IsNullOrWhiteSpace(mention))
+            return false;
+
+        var regex = Regex.Match(mention, @"^<@!?(\d{17,20})>$");
+        if (regex.Success && ulong.TryParse(regex.Groups[1].Value, out var id))
+        {
+            result = new Snowflake(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Parses a Snowflake from a Discord mention string, such as &lt;@123456789&gt; or &lt;@!123456789&gt;.
+    /// </summary>
+    /// <param name="mention">The mention string to parse.</param>
+    /// <returns>The parsed Snowflake.</returns>
+    /// <exception cref="FormatException">Thrown if the mention format is invalid.</exception>
+    public Snowflake ParseMention(string mention)
+    {
+        if (!TryParseMention(mention, out var result))
+             throw new FormatException("Invalid Discord mention format.");
+
+        return result;
+    }
+
+    /// <summary>
+    /// Determines whether a given string is a valid Discord Snowflake ID format (17–20 digit number).
+    /// </summary>
+    /// <param name="input">The input string to validate.</param>
+    /// <returns>True if the string appears to be a valid Discord Snowflake ID; otherwise, false.</returns>
+    public static bool IsValidDiscordIdFormat(string input)
+        => ulong.TryParse(input, out var val) && val.ToString().Length is >= 17 and <= 20;
+    
+    /// <summary>
+    /// Determines whether a given string is a valid Discord Snowflake ID format (17–20 digit number).
+    /// </summary>
+    /// <param name="input">The input string to validate.</param>
+    /// <returns>True if the string appears to be a valid Discord Snowflake ID; otherwise, false.</returns>
+    public static bool IsValidDiscordIdFormat(ulong input) 
+        => input.ToString().Length is >= 17 and <= 20;
+
+    /// <summary>
+    /// Determines whether a given string is a valid Discord Snowflake ID format (17–20 digit number).
+    /// </summary>
+    /// <param name="input">The input string to validate.</param>
+    /// <returns>True if the string appears to be a valid Discord Snowflake ID; otherwise, false.</returns>
+    public static bool IsValidDiscordIdFormat(long input)
+        => ulong.TryParse(input.ToString(), out var val) && val.ToString().Length is >= 17 and <= 20;
 }
 
 /// <summary>

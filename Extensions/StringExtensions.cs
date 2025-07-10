@@ -1,3 +1,5 @@
+using SharpCord.Types;
+
 namespace SharpCord.Extensions;
 
 /// <summary>
@@ -175,4 +177,41 @@ public static class StringExtensions
     /// <param name="str"></param>
     /// <returns></returns>
     public static string Timestamp(this string str) => ToTimestamp(str);
+
+    /// <summary>
+    /// Converts the string into a Snowflake instance.
+    /// </summary>
+    /// <param name="str">The string to convert.</param>
+    /// <returns>The resulting Snowflake.</returns>
+    /// <exception cref="FormatException">Thrown if the string is not a valid ulong.</exception>
+    public static Snowflake ToSnowflake(this string str)
+    {
+        if (string.IsNullOrWhiteSpace(str))
+            throw new ArgumentException("Input cannot be null or whitespace.", nameof(str));
+
+        if (!ulong.TryParse(str, out var snowflake))
+            throw new ArgumentException("Input is not a valid Snowflake.", nameof(str));
+
+        return new Snowflake(str);
+    }
+    
+    /// <summary>
+    /// Attempts to convert the string into a Snowflake.
+    /// </summary>
+    /// <param name="str">The input string.</param>
+    /// <param name="snowflake">The resulting Snowflake if successful; otherwise, default.</param>
+    /// <returns>True if conversion succeeded; false otherwise.</returns>
+    public static bool TryToSnowflake(this string str, out Snowflake snowflake)
+    {
+        snowflake = default;
+        if (string.IsNullOrWhiteSpace(str))
+            return false;
+        
+        if (!ulong.TryParse(str, out var snowflakeValue)) 
+            return false;
+        
+        snowflake = new Snowflake(snowflakeValue);
+        return true;
+
+    }
 }

@@ -88,6 +88,12 @@ public class DiscordClient
     }
 
     /// <summary>
+    /// Empty DiscordClient constructor.
+    /// <remarks>USE THIS AFTER YOU USED THE <c>DiscordClient();</c> CONSTRUCTOR WITH ARGUMENTS</remarks>
+    /// </summary>
+    public DiscordClient() { }
+
+    /// <summary>
     /// Authenticates the client and connects it to the Discord Gateway API.
     /// Establishes a WebSocket connection, identifies the bot, and begins listening
     /// for incoming events from Discord.
