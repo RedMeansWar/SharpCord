@@ -51,3 +51,20 @@ public class ShardReconnectionFailureException : ShardException
         : base($"Shard {shardId} failed to reconnect after {attempts} attempts.", shardId) => AttemptCount = attempts;
 }
 
+public class ShardEventTimeoutException : ShardException
+{
+    public string ExpectedEvent { get; }
+    public TimeSpan WaitedFor { get; }
+
+    public ShardEventTimeoutException(int shardId, string expectedEvent, TimeSpan waitedFor)
+        : base($"Shard {shardId} did not receive expected event '{expectedEvent}' after {waitedFor.TotalSeconds} seconds.", shardId)
+    {
+        ExpectedEvent = expectedEvent;
+        WaitedFor = waitedFor;
+    }
+}
+
+public class ShardNotReadyException : ShardException
+{
+    public ShardNotReadyException(int shardId) : base($"Shard {shardId} is not ready. Cannot perform operation until 'READY' is received.", shardId) { }
+}

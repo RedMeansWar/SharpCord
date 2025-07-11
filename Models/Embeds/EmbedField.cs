@@ -54,4 +54,13 @@ public class EmbedField
     /// </summary>
     [JsonPropertyName("inline")]
     public bool Inline { get; set; }
+    
+    public EmbedField() {}
+    
+    public EmbedField(string name, string value, bool inline = false)
+    {
+        Name = name;
+        Value = value;
+        Inline = inline;
+    }
 }

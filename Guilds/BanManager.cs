@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using System.Text.Json;
 using SharpCord.Helpers;
 using SharpCord.Interfaces;
@@ -32,6 +33,11 @@ public class BanManager
         Client = client;
         Guild = guild;
     }
+
+    /// <summary>
+    /// Empty constructor for <c>BanManager()</c>
+    /// </summary>
+    public BanManager() {}
 
     /// <summary>
     /// 

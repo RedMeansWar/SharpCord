@@ -38,7 +38,7 @@ public class BaseGuild : Base
     /// </summary>
     [JsonPropertyName("permissions")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public DiscordPermission? Permissions { get; set; }
+    public PermissionFlags? Permissions { get; set; }
 
     /// <summary>
     /// Gets or sets the list of features enabled for the guild.

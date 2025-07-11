@@ -43,7 +43,7 @@ public class BaseUser : Base
     /// </summary>
     /// <remarks>
     /// The identifier is a Snowflake, which is a 64-bit integer used for unique identification.
-    /// It encapsulates information such as the creation timestamp and worker ID.
+    /// It encapsulates information such as the creation of timestamp and worker ID.
     /// </remarks>
     public Snowflake Id { get; set; }
 
@@ -66,6 +66,11 @@ public class BaseUser : Base
     /// </remarks>
     public string Discriminator { get; set; } = string.Empty;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public string GlobalName { get; set; } = string.Empty;
+    
     /// <summary>
     /// Gets or sets the avatar hash associated with the user.
     /// </summary>
@@ -95,11 +100,71 @@ public class BaseUser : Base
     public bool? IsSystem { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether multi-factor authentication (MFA) is enabled for the user.
+    /// Gets or sets a value indicating whether multifactor authentication (MFA) is enabled for the user.
     /// </summary>
     /// <remarks>
     /// The value is a nullable boolean, where true indicates that MFA is enabled for the user,
     /// false indicates that it is not enabled, and null represents an unknown state.
     /// </remarks>
     public bool? MfaEnabled { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string? Banner { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public int? AccentColor { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public string? Locale { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool? Verified { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public string? Email { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public UserFlags? Flags { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public PremiumType? PremiumType { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public UserFlags? PublicFlags { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public AvatarDecorationData? AvatarDecoration { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public Collectables? Collectables { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public PrimaryGuild? PrimaryGuild { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<Snowflake> MutualGuilds { get; set; } = new();
 }

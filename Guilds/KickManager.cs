@@ -33,10 +33,16 @@ public class KickManager : BaseUser
     }
 
     /// <summary>
+    /// Empty constructor for <c>KickManager()</c>
+    /// </summary>
+    public KickManager() {}
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="options"></param>
+    /// <param name="logging"></param>
     /// <exception cref="Exception"></exception>
     public async Task KickAsync(Snowflake userId, IKickOptions? options = null, bool logging = false)
     {

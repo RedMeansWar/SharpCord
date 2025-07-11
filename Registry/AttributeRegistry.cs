@@ -4,6 +4,9 @@ using SharpCord.Utils;
 
 namespace SharpCord.Registry;
 
+/// <summary>
+/// 
+/// </summary>
 public static class AttributeRegistry
 {
     internal static List<MethodInfo> RegisteredActions { get; } = new();
@@ -27,8 +30,7 @@ public static class AttributeRegistry
                     case ModalAttribute modalAttr:
                     case CreateChannelAttribute createChannelAttr:
                     case DeleteChannelAttribute deleteChannelAttr:
-                    case AssignRoleAttribute assignRoleAttr:
-                    case IfUserHasPermissionAttribute userHasPermissionAttr: RegisteredActions.Add(method); break;
+                    case AssignRoleAttribute assignRoleAttr: RegisteredActions.Add(method); break;
                     default: Log.Warning($"Unknown attribute type: {attribute.GetType().Name}"); break;
                 }
             }

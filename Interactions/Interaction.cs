@@ -9,7 +9,6 @@ using SharpCord.Utils;
 using SharpCord.Guilds;
 using SharpCord.Users;
 using SharpCord.Messages;
-using Embed = SharpCord.Models.Embed;
 
 namespace SharpCord.Interactions;
 

@@ -13,13 +13,14 @@ namespace SharpCord.Guilds;
 public class Guild : BaseGuild
 {
     public Message Message { get; set; }
+    public Member Member { get; set; }
     
     /// <summary>
     /// 
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public async Task<BaseGuildMember?> GetMemberAsync(Snowflake userId)
+    public async Task<Member?> GetMemberAsync(Snowflake userId)
     {
         var url = $"/guilds/{Id}/members/{userId}";
         var response = await HttpHelper.SendRequestAsync(url);
@@ -28,7 +29,7 @@ public class Guild : BaseGuild
             return null;
 
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<BaseGuildMember>(json);
+        return JsonSerializer.Deserialize<Member>(json);
     }
 
     /// <summary>
@@ -36,9 +37,9 @@ public class Guild : BaseGuild
     /// </summary>
     /// <param name="roleId"></param>
     /// <returns></returns>
-    public async Task<List<BaseGuildMember>> GetMembersWithRoleAsync(Snowflake roleId)
+    public async Task<List<Member>> GetMembersWithRoleAsync(Snowflake roleId)
     {
-        var members = new List<BaseGuildMember>();
+        var members = new List<Member>();
         var url = $"/guilds/{Id}/members?limit=1000";
         
         var response = await HttpHelper.SendRequestAsync(url);
@@ -49,7 +50,7 @@ public class Guild : BaseGuild
         }
         
         var json = await response.Content.ReadAsStringAsync();
-        var allMembers = JsonSerializer.Deserialize<List<BaseGuildMember>>(json) ?? [];
+        var allMembers = JsonSerializer.Deserialize<List<Member>>(json) ?? [];
         
         foreach (var member in allMembers)
         {

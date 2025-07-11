@@ -170,7 +170,7 @@ public class Channel : BaseChannel
             message_id = messageId
         };
         
-        var response = await HttpHelper.SendRequestAsync($"/channels/{Id}/threads");
+        var response = await HttpHelper.SendRequestAsync($"/channels/{Id}/threads", "POST", payload);
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
@@ -181,6 +181,25 @@ public class Channel : BaseChannel
             Log.Info($"✅ Successfully created thread: {name}.");
         
         return await response.Content.ReadFromJsonAsync<Message>();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="channelId"></param>
+    /// <param name="logging"></param>
+    /// <exception cref="Exception"></exception>
+    public async Task SendTypingAsync(Snowflake channelId, bool logging = false)
+    {
+        var response = await HttpHelper.SendRequestAsync($"/channels/{channelId}/typing", "POST");
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new Exception($"❌ Failed to send typing state: {response.StatusCode}\n{body}");
+        }
+        
+        if (logging)
+            Log.Info($"✅ Successfully set typing state.");
     }
 
     #region Static Methods
@@ -221,17 +240,11 @@ public class Channel : BaseChannel
     public static async Task SendMessageAsync(string channelId, string message)
     {
         if (string.IsNullOrWhiteSpace(message))
-        {
             return;
-        }
 
-        var payload = new
-        {
-            content = message
-        };
+        var payload = new { content = message };
 
-        HttpResponseMessage res = await HttpHelper.SendRequestAsync($"/channels/{channelId}/messages", "POST", payload);
-
+        var res = await HttpHelper.SendRequestAsync($"/channels/{channelId}/messages", "POST", payload);
         if (!res.IsSuccessStatusCode)
         {
             Log.Error($"Failed to send message in channel: {res.StatusCode}\n{await res.Content.ReadAsStringAsync()}");

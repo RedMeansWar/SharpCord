@@ -81,18 +81,6 @@ public class Embed
     [JsonPropertyName("thumbnail")]
     public EmbedMedia? Thumbnail { get; set; }
 
-    /// Gets or sets the video associated with the embed.
-    /// Represents a video element that can be displayed within the embed, often associated with multimedia content.
-    /// This property is optional and may be null if no video is provided.
-    [JsonPropertyName("video")]
-    public EmbedMedia? Video { get; set; }
-
-    /// Gets or sets the provider information of the embed.
-    /// Represents the source or origin associated with the embed, often used to display attribution or contextual details.
-    /// This property is optional and may be null if no provider details are specified.
-    [JsonPropertyName("provider")]
-    public EmbedProvider? Provider { get; set; }
-
     /// Gets or sets the author of the embed.
     /// Represents the author section of the embed, typically used to include attribution or contextual details.
     /// This property is optional and may be null if an author is not specified.

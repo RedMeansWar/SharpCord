@@ -34,8 +34,18 @@ namespace SharpCord.Models;
 /// This class holds data related to a member of a Discord guild (server),
 /// including their nickname, roles, join date, premium status, and voice state information.
 /// </remarks>
-public class BaseGuildMember : Base
+public class BaseGuildMember : BaseUser
 {
+    /// <summary>
+    /// Gets or sets the user associated with the guild member.
+    /// </summary>
+    /// <remarks>
+    /// Represents the user object linked to the guild member, providing details such as
+    /// the user's identifier, username, and other account-specific information.
+    /// This property serves to tie a guild member to their corresponding user entity.
+    /// </remarks>
+    public BaseUser User { get; set; } // sometimes present in member payloads
+    
     /// <summary>
     /// Gets or sets the nickname of the guild member.
     /// </summary>
@@ -44,7 +54,7 @@ public class BaseGuildMember : Base
     /// It can be used to differentiate the member's identity from their global username.
     /// If no nickname is set, this property may return null.
     /// </remarks>
-    public string? Nick { get; set; }
+    public string? Nickname { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of role identifiers associated with the member.
@@ -62,7 +72,7 @@ public class BaseGuildMember : Base
     /// This property represents the exact date and time the guild member joined. It is useful
     /// for tracking membership duration and is typically provided in UTC format.
     /// </remarks>
-    public DateTimeOffset JoinedAt { get; set; }
+    public DateTimeOffset? JoinedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the timestamp indicating when the member began their premium subscription.
@@ -80,7 +90,7 @@ public class BaseGuildMember : Base
     /// If set to true, the member cannot hear audio in a voice channel. This is often used
     /// to enforce server-wide deafening or during administrative actions.
     /// </remarks>
-    public bool Deaf { get; set; }
+    public bool? Deaf { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the member is muted in a voice channel.
@@ -89,15 +99,25 @@ public class BaseGuildMember : Base
     /// If set to true, the member's audio is suppressed in the voice channel. This is typically
     /// used to enforce administrative actions or for moderation purposes in voice communications.
     /// </remarks>
-    public bool Mute { get; set; }
+    public bool? Mute { get; set; }
 
     /// <summary>
-    /// Gets or sets the user associated with the guild member.
+    /// 
     /// </summary>
-    /// <remarks>
-    /// Represents the user object linked to the guild member, providing details such as
-    /// the user's identifier, username, and other account-specific information.
-    /// This property serves to tie a guild member to their corresponding user entity.
-    /// </remarks>
-    public BaseUser User { get; set; } // sometimes present in member payloads
+    public bool? Pending { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public string? Avatar { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public Snowflake GuildId { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public PermissionFlags? ComputedPermissions { get; set; }
 }
